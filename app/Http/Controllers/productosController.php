@@ -3,44 +3,45 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\producto;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Producto;
 
-class productosController extends Controller
+class ProductosController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Listado de productos.
      */
     public function index()
     {
-        $productos = producto::all();
-        return view('productos.index', compact('productos'));
+        $productos = Producto::all();
+        return view('admin.productos', compact('productos'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Formulario de creación.
      */
     public function create()
     {
-        return view('productos.create');
+        return view('admin.producto_nuevo');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Guardar nuevo producto.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre'      => 'required|string|max:255',
-            'sabor'       => 'required|string|max:255',
-            'tamaño'      => 'required|string|max:255',
-            'categoria'   => 'required|string|max:255',
-            'precio'      => 'required|numeric|min:0',
-            'stock'       => 'nullable|integer|min:0',
-            'disponible'  => 'nullable|boolean',
-            'imagen'      => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'nombre'     => 'required|string|max:255',
+            'sabor'      => 'required|string|max:255',
+            'tamano'     => 'required|string|max:255',
+            'categoria'  => 'required|string|max:255',
+            'precio'     => 'required|numeric|min:0',
+            'stock'      => 'nullable|integer|min:0',
+            'disponible' => 'nullable|boolean',
+            'imagen'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $validated['stock'] = $validated['stock'] ?? 0;
+        $validated['stock']      = $validated['stock'] ?? 0;
         $validated['disponible'] = $request->boolean('disponible');
 
         if ($request->hasFile('imagen')) {
@@ -49,39 +50,83 @@ class productosController extends Controller
 
         Producto::create($validated);
 
-        return redirect()->route('productos.index')->with('success', 'Producto creado correctamente.');
+        return redirect()->route('productos.index')
+            ->with('success', 'Producto creado correctamente.');
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Formulario de edición.
      */
     public function edit(string $id)
     {
-        //
+        $producto = Producto::findOrFail($id);
+        return view('admin.producto_modifica', compact('producto'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Actualizar producto existente.
+     *
+     * Problemas que se corrigen:
+     * - stock nullable: se asigna 0 si viene vacío en lugar de dejar null.
+     * - disponible: viene como checkbox (puede no venir si está desmarcado); el
+     *   hidden input del formulario garantiza que siempre llegue un valor, pero
+     *   usamos boolean() para seguridad.
+     * - eliminar_imagen: permite borrar la imagen actual sin subir una nueva.
+     * - Sin imagen nueva y sin solicitud de eliminar → se conserva la imagen.
      */
     public function update(Request $request, string $id)
     {
-        //
+        $producto = Producto::findOrFail($id);
+
+        $validated = $request->validate([
+            'nombre'          => 'required|string|max:255',
+            'sabor'           => 'required|string|max:255',
+            'tamano'          => 'required|string|max:255',
+            'categoria'       => 'required|string|max:255',
+            'precio'          => 'required|numeric|min:0',
+            'stock'           => 'nullable|integer|min:0',
+            'disponible'      => 'nullable|boolean',
+            'imagen'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'eliminar_imagen' => 'nullable|boolean',
+        ]);
+
+        $validated['stock']      = $validated['stock'] ?? 0;
+        $validated['disponible'] = $request->boolean('disponible');
+
+        // — Caso 1: se sube nueva imagen → reemplazar
+        if ($request->hasFile('imagen')) {
+            if ($producto->imagen) {
+                Storage::disk('public')->delete($producto->imagen);
+            }
+            $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
+
+        // — Caso 2: se marca eliminar imagen sin subir nueva → borrar y dejar null
+        } elseif ($request->boolean('eliminar_imagen')) {
+            if ($producto->imagen) {
+                Storage::disk('public')->delete($producto->imagen);
+            }
+            $validated['imagen'] = null;
+
+        // — Caso 3: ninguna acción sobre imagen → conservar la actual
+        } else {
+            unset($validated['imagen']);
+        }
+
+        // Limpiar campos auxiliares que no son columnas de la tabla
+        unset($validated['eliminar_imagen']);
+
+        $producto->update($validated);
+
+        return redirect()->route('productos.index')
+            ->with('success', 'Producto actualizado correctamente.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Eliminar producto.
      */
     public function destroy(string $id)
     {
-        $producto = producto::findOrFail($id);
+        $producto = Producto::findOrFail($id);
 
         if ($producto->imagen) {
             Storage::disk('public')->delete($producto->imagen);
@@ -89,6 +134,7 @@ class productosController extends Controller
 
         $producto->delete();
 
-        return redirect()->route('productos.index')->with('success', 'Producto eliminado correctamente.');
+        return redirect()->route('productos.index')
+            ->with('success', 'Producto eliminado correctamente.');
     }
 }

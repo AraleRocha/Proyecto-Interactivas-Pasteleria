@@ -1,238 +1,264 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center gap-3">
-            <a href="{{ route('productos.index') }}"
-               class="inline-flex items-center rounded-lg p-1.5 text-gray-500 transition hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-            </a>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                Nuevo producto
-            </h2>
+<x-app-layout :title="__('Nuevo Pastel')">
+    <x-amo-styles />
+
+    {{-- ══════ MAIN ══════ --}}
+    <main class="amo-main">
+
+        {{-- Breadcrumb + Title --}}
+        <div style="margin-bottom:28px;">
+            <nav class="amo-breadcrumb">
+                <a href="{{ route('productos.index') }}">Inventario</a>
+                <span class="material-symbols-outlined" style="font-size:15px;">chevron_right</span>
+                <span class="current">Nuevo Pastel</span>
+            </nav>
+            <h1 style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--on-surface);line-height:1.1;margin-bottom:6px;">
+                Crear Nuevo Pastel
+            </h1>
+            <p style="font-size:15px;color:var(--on-surface-variant);max-width:560px;">
+                Registre una nueva creación artesanal. Complete los detalles del sabor, tamaño y disponibilidad para los clientes.
+            </p>
         </div>
-    </x-slot>
 
-    <div class="py-8">
-        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        {{-- Error banner --}}
+        @if($errors->any())
+            <div class="amo-error-banner">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-            <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data"
-                  class="space-y-6">
-                @csrf
+        {{-- BENTO GRID --}}
+        <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
 
-                {{-- Errores globales --}}
-                @if($errors->any())
-                    <div class="rounded-lg bg-red-50 px-4 py-3 dark:bg-red-900/30">
-                        <ul class="list-inside list-disc space-y-1 text-sm text-red-700 dark:text-red-400">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+            <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;">
 
-                {{-- Card principal --}}
-                <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-
-                    {{-- Sección: Información básica --}}
-                    <div class="border-b border-gray-100 px-6 py-4 dark:border-gray-700">
-                        <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                            Información básica
-                        </h3>
-                    </div>
-
-                    <div class="grid gap-5 px-6 py-5 sm:grid-cols-2">
-
-                        {{-- Nombre --}}
-                        <div class="sm:col-span-2">
-                            <label for="nombre" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Nombre <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="nombre" name="nombre"
-                                   value="{{ old('nombre') }}"
-                                   placeholder="Ej. Agua mineral premium"
-                                   class="w-full rounded-lg border @error('nombre') border-red-400 @else border-gray-300 @enderror bg-white px-3 py-2 text-sm shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500">
-                            @error('nombre')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
+                {{-- ── LEFT COLUMN ── --}}
+                <div>
+                    {{-- Información General --}}
+                    <div class="amo-card">
+                        <div class="amo-card-header">
+                            <span class="material-symbols-outlined" style="color:var(--secondary);">edit_note</span>
+                            <h3>Información General</h3>
                         </div>
+                        <div class="amo-card-body">
+                            <div class="amo-grid-2" style="margin-bottom:20px;">
+                                {{-- Nombre --}}
+                                <div class="amo-col-span-2">
+                                    <label for="nombre" class="amo-label">
+                                        Nombre del Pastel <span style="color:var(--error);">*</span>
+                                    </label>
+                                    <input type="text" id="nombre" name="nombre"
+                                           value="{{ old('nombre') }}"
+                                           placeholder="Ej. Terciopelo Rojo Clásico"
+                                           class="amo-input @error('nombre') error @enderror">
+                                    @error('nombre')
+                                        <p class="amo-error-msg">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                        {{-- Sabor --}}
-                        <div>
-                            <label for="sabor" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Sabor <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="sabor" name="sabor"
-                                   value="{{ old('sabor') }}"
-                                   placeholder="Ej. Natural, Lima, Fresa..."
-                                   class="w-full rounded-lg border @error('sabor') border-red-400 @else border-gray-300 @enderror bg-white px-3 py-2 text-sm shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500">
-                            @error('sabor')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
+                                {{-- Sabor --}}
+                                <div>
+                                    <label for="sabor" class="amo-label">
+                                        Sabor <span style="color:var(--error);">*</span>
+                                    </label>
+                                    <input type="text" id="sabor" name="sabor"
+                                           value="{{ old('sabor') }}"
+                                           placeholder="Ej. Vainilla de Papantla"
+                                           class="amo-input @error('sabor') error @enderror">
+                                    @error('sabor')
+                                        <p class="amo-error-msg">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                        {{-- Tamaño --}}
-                        <div>
-                            <label for="tamaño" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Tamaño <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="tamaño" name="tamaño"
-                                   value="{{ old('tamaño') }}"
-                                   placeholder="Ej. 500ml, 1L, Grande..."
-                                   class="w-full rounded-lg border @error('tamaño') border-red-400 @else border-gray-300 @enderror bg-white px-3 py-2 text-sm shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-500">
-                            @error('tamaño')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- Categoría --}}
-                        <div>
-                            <label for="categoria" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Categoría <span class="text-red-500">*</span>
-                            </label>
-                            <select id="categoria" name="categoria"
-                                    class="w-full rounded-lg border @error('categoria') border-red-400 @else border-gray-300 @enderror bg-white px-3 py-2 text-sm shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
-                                <option value="">— Seleccionar —</option>
-                                @foreach(['Agua', 'Refresco', 'Jugo', 'Energizante', 'Té', 'Café', 'Lácteo', 'Otro'] as $cat)
-                                    <option value="{{ $cat }}" {{ old('categoria') === $cat ? 'selected' : '' }}>
-                                        {{ $cat }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('categoria')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- Precio --}}
-                        <div>
-                            <label for="precio" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Precio <span class="text-red-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-gray-400">$</span>
-                                <input type="number" id="precio" name="precio"
-                                       value="{{ old('precio') }}"
-                                       min="0" step="0.01" placeholder="0.00"
-                                       class="w-full rounded-lg border @error('precio') border-red-400 @else border-gray-300 @enderror bg-white py-2 pl-7 pr-3 text-sm shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
-                            </div>
-                            @error('precio')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                    </div>
-
-                    {{-- Sección: Inventario y estado --}}
-                    <div class="border-b border-t border-gray-100 px-6 py-4 dark:border-gray-700">
-                        <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                            Inventario y estado
-                        </h3>
-                    </div>
-
-                    <div class="grid gap-5 px-6 py-5 sm:grid-cols-2">
-
-                        {{-- Stock --}}
-                        <div>
-                            <label for="stock" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Stock
-                            </label>
-                            <input type="number" id="stock" name="stock"
-                                   value="{{ old('stock', 0) }}"
-                                   min="0"
-                                   class="w-full rounded-lg border @error('stock') border-red-400 @else border-gray-300 @enderror bg-white px-3 py-2 text-sm shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
-                            @error('stock')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        {{-- Disponible --}}
-                        <div class="flex items-end pb-1">
-                            <label class="relative inline-flex cursor-pointer items-center gap-3">
-                                <input type="hidden" name="disponible" value="0">
-                                <input type="checkbox" id="disponible" name="disponible" value="1"
-                                       {{ old('disponible', true) ? 'checked' : '' }}
-                                       class="peer sr-only">
-                                <div class="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-all peer-checked:bg-indigo-600 peer-checked:after:translate-x-full dark:bg-gray-700"></div>
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Disponible para venta</span>
-                            </label>
-                        </div>
-
-                    </div>
-
-                    {{-- Sección: Imagen --}}
-                    <div class="border-b border-t border-gray-100 px-6 py-4 dark:border-gray-700">
-                        <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                            Imagen del producto
-                        </h3>
-                    </div>
-
-                    <div class="px-6 py-5">
-                        <label for="imagen" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            Imagen <span class="text-red-500">*</span>
-                        </label>
-
-                        {{-- Zona de drop --}}
-                        <div id="drop-zone"
-                             class="relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition hover:border-indigo-400 hover:bg-indigo-50/30 dark:border-gray-600 dark:bg-gray-700/40 dark:hover:border-indigo-500">
-
-                            <img id="preview-img" src="" alt="Preview" class="hidden h-36 w-auto rounded-lg object-contain p-2" />
-
-                            <div id="placeholder-content" class="flex flex-col items-center gap-2 text-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    Arrastra una imagen o
-                                    <span class="font-medium text-indigo-600 dark:text-indigo-400">haz clic para seleccionar</span>
-                                </p>
-                                <p class="text-xs text-gray-400">PNG, JPG, WEBP hasta 2MB</p>
+                                {{-- Categoría --}}
+                                <div>
+                                    <label for="categoria" class="amo-label">
+                                        Categoría <span style="color:var(--error);">*</span>
+                                    </label>
+                                    <select id="categoria" name="categoria" class="amo-select @error('categoria') error @enderror">
+                                        <option value="">Seleccionar</option>
+                                        @foreach(['Boda','Cumpleaños','Bautizo','XV Años','Aniversarios','Baby Showers','Graduaciones'] as $cat)
+                                            <option value="{{ $cat }}" {{ old('categoria') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('categoria')
+                                        <p class="amo-error-msg">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
 
-                            <input type="file" id="imagen" name="imagen" accept="image/*"
-                                   class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                                   onchange="previewImagen(this)">
+                            {{-- Tips --}}
+                            <div style="margin-top:20px;display:flex;flex-direction:column;gap:12px;">
+                                <div class="amo-tip">
+                                    <div class="amo-tip-icon primary-fixed">
+                                        <span class="material-symbols-outlined" style="color:var(--primary);font-size:20px;">palette</span>
+                                    </div>
+                                    <div>
+                                        <p style="font-size:13px;font-weight:600;color:var(--on-surface);">Nombre memorable</p>
+                                        <p style="font-size:12px;color:var(--on-surface-variant);margin-top:2px;">Un nombre evocador ayuda a que los clientes recuerden y compartan tu creación.</p>
+                                    </div>
+                                </div>
+                                <div class="amo-tip">
+                                    <div class="amo-tip-icon secondary-container">
+                                        <span class="material-symbols-outlined" style="color:var(--secondary);font-size:20px;">description</span>
+                                    </div>
+                                    <div>
+                                        <p style="font-size:13px;font-weight:600;color:var(--on-surface);">Descripción completa</p>
+                                        <p style="font-size:12px;color:var(--on-surface-variant);margin-top:2px;">Incluye la ocasión ideal, ingredientes especiales y personalización disponible.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        @error('imagen')
-                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                        @enderror
                     </div>
 
+                    {{-- Precio e Inventario --}}
+                    <div class="amo-card">
+                        <div class="amo-card-header">
+                            <span class="material-symbols-outlined" style="color:var(--secondary);">payments</span>
+                            <h3>Precio e Inventario</h3>
+                        </div>
+                        <div class="amo-card-body">
+                            <div class="amo-grid-3">
+                                {{-- Precio --}}
+                                <div>
+                                    <label for="precio" class="amo-label">
+                                        Precio (MXN) <span style="color:var(--error);">*</span>
+                                    </label>
+                                    <div class="amo-input-prefix">
+                                        <span class="prefix">$</span>
+                                        <input type="number" id="precio" name="precio"
+                                               value="{{ old('precio') }}"
+                                               min="0" step="0.01" placeholder="0.00"
+                                               class="amo-input @error('precio') error @enderror">
+                                    </div>
+                                    @error('precio')
+                                        <p class="amo-error-msg">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                {{-- Stock --}}
+                                <div>
+                                    <label for="stock" class="amo-label">Stock Inicial</label>
+                                    <input type="number" id="stock" name="stock"
+                                           value="{{ old('stock', 0) }}"
+                                           min="0"
+                                           class="amo-input @error('stock') error @enderror">
+                                    @error('stock')
+                                        <p class="amo-error-msg">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                {{-- Tamaño --}}
+                                <div>
+                                    <label for="tamano" class="amo-label">
+                                        Tamaño <span style="color:var(--error);">*</span>
+                                    </label>
+                                    <select id="tamano" name="tamano" class="amo-select @error('tamano') error @enderror">
+                                        <option value="">Seleccionar</option>
+                                        @foreach(['Pequeño - 5 personas','Mediano - 10 personas','Grande - 20 personas'] as $tam)
+                                            <option value="{{ $tam }}" {{ old('tamano') === $tam ? 'selected' : '' }}>{{ $tam }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('tamano')
+                                        <p class="amo-error-msg">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {{-- Botones --}}
-                <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('productos.index') }}"
-                       class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
-                        Cancelar
-                    </a>
-                    <button type="submit"
-                            class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        Guardar producto
-                    </button>
-                </div>
+                {{-- ── RIGHT COLUMN ── --}}
+                <div style="display:flex;flex-direction:column;gap:20px;">
 
-            </form>
-        </div>
-    </div>
+                    {{-- Imagen --}}
+                    <div class="amo-card">
+                        <div class="amo-card-header">
+                            <span class="material-symbols-outlined" style="color:var(--secondary);">image</span>
+                            <h3>Imagen</h3>
+                        </div>
+                        <div class="amo-card-body">
+                            <div class="amo-drop-zone" id="drop-zone">
+                                <img id="preview-img" src="" alt="Preview" style="display:none;max-height:160px;border-radius:8px;object-fit:contain;">
+                                <div id="placeholder-content">
+                                    <span class="material-symbols-outlined drop-icon">cloud_upload</span>
+                                    <div>
+                                        <p style="font-size:14px;font-weight:600;color:var(--on-surface);">Subir Fotografía</p>
+                                        <p style="font-size:12px;color:var(--on-surface-variant);margin-top:4px;">Arrastra o haz clic para buscar</p>
+                                    </div>
+                                </div>
+                                <input type="file" id="imagen" name="imagen" accept="image/*"
+                                       onchange="previewImagen(this)">
+                            </div>
+                            <p style="font-size:12px;color:var(--on-surface-variant);margin-top:10px;text-align:center;font-style:italic;">
+                                PNG, JPG, WEBP · Máx. 2 MB
+                            </p>
+                            @error('imagen')
+                                <p class="amo-error-msg" style="text-align:center;">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    {{-- Visibilidad --}}
+                    <div class="amo-card">
+                        <div class="amo-card-header">
+                            <span class="material-symbols-outlined" style="color:var(--secondary);">visibility</span>
+                            <h3>Visibilidad</h3>
+                        </div>
+                        <div class="amo-card-body">
+                            <div class="amo-toggle-wrap">
+                                <div>
+                                    <p class="amo-toggle-label">Disponible</p>
+                                    <p class="amo-toggle-sub">Mostrar en tienda online</p>
+                                </div>
+                                <label class="amo-switch">
+                                    <input type="hidden" name="disponible" value="0">
+                                    <input type="checkbox" name="disponible" value="1"
+                                           {{ old('disponible', true) ? 'checked' : '' }}>
+                                    <div class="amo-switch-track"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Actions --}}
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <button type="submit" class="amo-btn-primary full-width">
+                            <span class="material-symbols-outlined" style="font-size:20px;">save</span>
+                            Guardar Pastel
+                        </button>
+                        <a href="{{ route('productos.index') }}" class="amo-btn-ghost">
+                            Cancelar
+                        </a>
+                    </div>
+                </div>{{-- /right column --}}
+            </div>{{-- /bento grid --}}
+        </form>
+    </main>
 
     <script>
         function previewImagen(input) {
-            const preview = document.getElementById('preview-img');
+            const preview     = document.getElementById('preview-img');
             const placeholder = document.getElementById('placeholder-content');
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = e => {
                     preview.src = e.target.result;
-                    preview.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+        // Drag-and-drop visual feedback
+        const zone = document.getElementById('drop-zone');
+        zone.addEventListener('dragover',  e => { e.preventDefault(); zone.style.borderColor = 'var(--primary)'; zone.style.background = 'rgba(151,49,0,0.04)'; });
+        zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; zone.style.background = ''; });
+        zone.addEventListener('drop',      e => { zone.style.borderColor = ''; zone.style.background = ''; });
     </script>
 </x-app-layout>

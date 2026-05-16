@@ -1,141 +1,181 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                Productos
-            </h2>
-            <a href="{{ route('productos.create') }}"
-               class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Nuevo producto
+<x-app-layout :title="__('Pasteles')">
+    <x-amo-styles />
+
+    {{-- ══════ MAIN ══════ --}}
+    <main class="amo-main">
+
+        {{-- Page title --}}
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:32px;">
+            <div>
+                <h2 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:600;color:var(--on-surface);line-height:1.2;">
+                    Inventario de Pasteles
+                </h2>
+                <p style="font-size:16px;color:var(--on-surface-variant);margin-top:4px;">
+                    Gestione la disponibilidad y stock de sus creaciones artesanales.
+                </p>
+            </div>
+            <a href="{{ route('productos.create') }}" class="amo-btn-primary">
+                <span class="material-symbols-outlined" style="font-size:20px;">add</span>
+                Nuevo Pastel
             </a>
         </div>
-    </x-slot>
 
-    <div class="py-8">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {{-- Flash --}}
+        @if(session('success'))
+            <div class="amo-flash-ok">{{ session('success') }}</div>
+        @endif
 
-            {{-- Flash messages --}}
-            @if(session('success'))
-                <div class="mb-4 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                    {{ session('success') }}
+        {{-- Metric Cards --}}
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;margin-bottom:32px;">
+            <div class="amo-metric-card">
+                <span class="amo-metric-label">Total SKU</span>
+                <span class="amo-metric-value primary">{{ $productos->count() }}</span>
+                <span class="amo-metric-sub" style="color:#16a34a;">
+                    <span class="material-symbols-outlined" style="font-size:14px;">trending_up</span> Catálogo activo
+                </span>
+            </div>
+            <div class="amo-metric-card">
+                <span class="amo-metric-label">Poco Stock</span>
+                <span class="amo-metric-value">{{ $productos->filter(fn($p) => $p->stock > 0 && $p->stock <= 5)->count() }}</span>
+                <span class="amo-metric-sub" style="color:var(--primary);">
+                    <span class="material-symbols-outlined" style="font-size:14px;">warning</span> Acción requerida
+                </span>
+            </div>
+            <div class="amo-metric-card">
+                <span class="amo-metric-label">Disponibles</span>
+                <span class="amo-metric-value">{{ $productos->where('disponible', true)->count() }}</span>
+                <span class="amo-metric-sub" style="color:#16a34a;">
+                    <span class="material-symbols-outlined" style="font-size:14px;">cake</span> En tienda
+                </span>
+            </div>
+            <div class="amo-metric-card" style="border:1px solid rgba(151,49,0,0.15);">
+                <span class="amo-metric-label" style="color:var(--primary);">Valor Stock</span>
+                <span class="amo-metric-value">
+                    ${{ number_format($productos->sum(fn($p) => $p->precio * $p->stock), 0) }}
+                </span>
+                <span class="amo-metric-sub" style="color:var(--on-surface-variant);opacity:.6;">Inventario activo</span>
+            </div>
+        </div>
+
+        {{-- Table Card --}}
+        <div class="amo-table-card">
+
+            {{-- Toolbar --}}
+            <div class="amo-table-toolbar">
+                <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+                    <button class="amo-tab-btn active" onclick="setTab(this,'')">Todos</button>
+                    @foreach(['Boda','Cumpleaños','Bautizo','XV Años','Sin Gluten'] as $cat)
+                        <button class="amo-tab-btn" onclick="setTab(this,'{{ strtolower($cat) }}')">{{ $cat }}</button>
+                    @endforeach
                 </div>
-            @endif
-
-            {{-- Filtros --}}
-            <div class="mb-6 flex flex-wrap items-center gap-3">
-                <input
-                    type="text"
-                    placeholder="Buscar por nombre..."
-                    class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-                    id="search-input"
-                    onkeyup="filtrarTabla()"
-                />
-                <select
-                    class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
-                    id="filter-disponible"
-                    onchange="filtrarTabla()"
-                >
-                    <option value="">Todos</option>
-                    <option value="1">Disponible</option>
-                    <option value="0">No disponible</option>
-                </select>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <select class="amo-filter-select" id="filter-disponible" onchange="filtrarTabla()">
+                        <option value="">Todos los estados</option>
+                        <option value="1">Disponible</option>
+                        <option value="0">No disponible</option>
+                    </select>
+                    <button class="amo-icon-btn"><span class="material-symbols-outlined">filter_list</span></button>
+                    <button class="amo-icon-btn"><span class="material-symbols-outlined">download</span></button>
+                </div>
             </div>
 
-            {{-- Tabla --}}
-            <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700" id="tabla-productos">
-                    <thead class="bg-gray-50 dark:bg-gray-900/50">
+            {{-- Table --}}
+            <div style="overflow-x:auto;">
+                <table id="tabla-productos">
+                    <thead>
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Imagen</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Nombre</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Sabor</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Tamaño</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Categoría</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Precio</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Stock</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Estado</th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Acciones</th>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Sabor</th>
+                            <th>Tamaño</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th style="text-align:right;">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                    <tbody>
                         @forelse($productos as $producto)
-                            <tr class="transition hover:bg-gray-50 dark:hover:bg-gray-700/40"
-                                data-nombre="{{ strtolower($producto->nombre) }}"
+                            @php
+                                $stockPct = $producto->stock > 0 ? min(100, ($producto->stock / max($producto->stock, 30)) * 100) : 0;
+                                $stockColor = $producto->stock > 10 ? '#16a34a' : ($producto->stock > 0 ? '#d97706' : '#dc2626');
+                            @endphp
+                            <tr data-nombre="{{ strtolower($producto->nombre) }}"
+                                data-categoria="{{ strtolower($producto->categoria) }}"
                                 data-disponible="{{ $producto->disponible ? '1' : '0' }}">
 
-                                <td class="px-4 py-3">
+                                {{-- Imagen --}}
+                                <td>
                                     @if($producto->imagen)
-                                        <img src="{{ asset('storage/' . $producto->imagen) }}"
-                                             alt="{{ $producto->nombre }}"
-                                             class="h-12 w-12 rounded-lg object-cover shadow-sm" />
+                                        <div style="width:56px;height:56px;border-radius:10px;overflow:hidden;border:1px solid var(--surface-container-highest);box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                                            <img src="{{ asset('storage/' . $producto->imagen) }}"
+                                                 alt="{{ $producto->nombre }}"
+                                                 style="width:100%;height:100%;object-fit:cover;">
+                                        </div>
                                     @else
-                                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
+                                        <div style="width:56px;height:56px;border-radius:10px;background:var(--surface-container);display:flex;align-items:center;justify-content:center;">
+                                            <span class="material-symbols-outlined" style="color:var(--on-surface-variant);font-size:22px;">image_not_supported</span>
                                         </div>
                                     @endif
                                 </td>
 
-                                <td class="px-4 py-3">
-                                    <span class="font-medium text-gray-900 dark:text-gray-100">{{ $producto->nombre }}</span>
+                                {{-- Nombre --}}
+                                <td>
+                                    <p style="font-weight:600;font-size:14px;color:var(--on-surface);">{{ $producto->nombre }}</p>
                                 </td>
 
-                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
-                                    {{ $producto->sabor }}
+                                {{-- Sabor --}}
+                                <td style="color:var(--on-surface-variant);">{{ $producto->sabor }}</td>
+
+                                {{-- Tamaño --}}
+                                <td style="color:var(--on-surface-variant);">{{ $producto->tamano }}</td>
+
+                                {{-- Categoría --}}
+                                <td>
+                                    <span class="amo-badge amo-badge-classic">{{ $producto->categoria }}</span>
                                 </td>
 
-                                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">
-                                    {{ $producto->tamaño }}
+                                {{-- Precio --}}
+                                <td>
+                                    <span style="font-weight:700;color:var(--primary);">${{ number_format($producto->precio, 2) }}</span>
                                 </td>
 
-                                <td class="px-4 py-3">
-                                    <span class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
-                                        {{ $producto->categoria }}
-                                    </span>
+                                {{-- Stock --}}
+                                <td>
+                                    <div class="amo-stock-bar">
+                                        <div class="amo-bar-track">
+                                            <div class="amo-bar-fill" style="width:{{ $stockPct }}%;background:{{ $stockColor }};"></div>
+                                        </div>
+                                        <span style="font-size:13px;font-weight:600;color:{{ $stockColor }};">{{ $producto->stock }}</span>
+                                    </div>
                                 </td>
 
-                                <td class="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                    ${{ number_format($producto->precio, 2) }}
-                                </td>
-
-                                <td class="px-4 py-3">
-                                    <span class="text-sm font-medium {{ $producto->stock > 10 ? 'text-green-600 dark:text-green-400' : ($producto->stock > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400') }}">
-                                        {{ $producto->stock }}
-                                    </span>
-                                </td>
-
-                                <td class="px-4 py-3">
+                                {{-- Estado --}}
+                                <td>
                                     @if($producto->disponible)
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                                            Disponible
+                                        <span class="amo-status-badge amo-status-on">
+                                            <span class="amo-status-dot"></span> Disponible
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-                                            No disponible
+                                        <span class="amo-status-badge amo-status-off">
+                                            <span class="amo-status-dot"></span> No disponible
                                         </span>
                                     @endif
                                 </td>
 
-                                <td class="px-4 py-3 text-right">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('productos.edit', $producto->id) }}"
-                                           class="inline-flex items-center rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
-                                            Editar
+                                {{-- Acciones --}}
+                                <td style="text-align:right;">
+                                    <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center;">
+                                        <a href="{{ route('productos.edit', $producto->id) }}" class="amo-btn-edit">
+                                            <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">edit</span>Editar
                                         </a>
-
                                         <form action="{{ route('productos.destroy', $producto->id) }}" method="POST"
-                                              onsubmit="return confirm('¿Eliminar este producto?')">
+                                              onsubmit="return confirm('¿Eliminar este producto?')" style="margin:0;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                    class="inline-flex items-center rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 shadow-sm transition hover:bg-red-50 dark:border-red-800 dark:bg-gray-700 dark:text-red-400 dark:hover:bg-red-900/20">
-                                                Eliminar
+                                            <button type="submit" class="amo-btn-del">
+                                                <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">delete</span>Eliminar
                                             </button>
                                         </form>
                                     </div>
@@ -143,9 +183,12 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-4 py-12 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    No hay productos registrados.
-                                    <a href="{{ route('productos.create') }}" class="ml-1 font-medium text-indigo-600 hover:underline dark:text-indigo-400">Crear el primero</a>
+                                <td colspan="9" style="text-align:center;padding:48px 24px;">
+                                    <span class="material-symbols-outlined" style="font-size:48px;color:var(--outline-variant);display:block;margin-bottom:12px;">inventory_2</span>
+                                    <p style="color:var(--on-surface-variant);font-size:15px;">No hay productos registrados.</p>
+                                    <a href="{{ route('productos.create') }}" class="amo-btn-primary" style="margin-top:16px;display:inline-flex;">
+                                        <span class="material-symbols-outlined" style="font-size:18px;">add</span> Crear el primero
+                                    </a>
                                 </td>
                             </tr>
                         @endforelse
@@ -153,30 +196,45 @@
                 </table>
             </div>
 
-            {{-- Paginación --}}
-            @if($productos->hasPages())
-                <div class="mt-4">
+            {{-- Pagination --}}
+            @if(method_exists($productos, 'links'))
+            <div class="amo-pagination">
+                <span style="font-size:13px;color:var(--on-surface-variant);">
+                    Mostrando {{ $productos->firstItem() }}–{{ $productos->lastItem() }} de {{ $productos->count() }} pasteles
+                </span>
+                <div style="display:flex;align-items:center;gap:6px;">
                     {{ $productos->links() }}
                 </div>
+            </div>
             @endif
-
         </div>
-    </div>
+    </main>
 
     <script>
+        let activeCategoria = '';
+
+        function setTab(btn, cat) {
+            document.querySelectorAll('.amo-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeCategoria = cat;
+            filtrarTabla();
+        }
+
         function filtrarTabla() {
-            const search = document.getElementById('search-input').value.toLowerCase();
+            const search     = document.getElementById('search-input')?.value.toLowerCase() ?? '';
             const disponible = document.getElementById('filter-disponible').value;
-            const rows = document.querySelectorAll('#tabla-productos tbody tr[data-nombre]');
+            const rows       = document.querySelectorAll('#tabla-productos tbody tr[data-nombre]');
 
             rows.forEach(row => {
-                const nombre = row.dataset.nombre || '';
-                const rowDisponible = row.dataset.disponible || '';
+                const nombre    = row.dataset.nombre    || '';
+                const categoria = row.dataset.categoria || '';
+                const rowDisp   = row.dataset.disponible|| '';
 
-                const matchSearch = nombre.includes(search);
-                const matchDisponible = disponible === '' || rowDisponible === disponible;
+                const matchSearch     = nombre.includes(search);
+                const matchDisponible = disponible === '' || rowDisp === disponible;
+                const matchCategoria  = activeCategoria === '' || categoria.includes(activeCategoria);
 
-                row.style.display = matchSearch && matchDisponible ? '' : 'none';
+                row.style.display = matchSearch && matchDisponible && matchCategoria ? '' : 'none';
             });
         }
     </script>
