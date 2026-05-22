@@ -3,6 +3,214 @@
     <x-amo-styles />
 
     <style>
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 28px;
+            margin-bottom: 64px;
+        }
+
+        .cat-card {
+            background: var(--surface-container-lowest);
+            border: 1px solid rgba(225,191,180,0.55);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 6px 22px rgba(0,0,0,0.05);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            position: relative;
+        }
+
+        .cat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 34px rgba(0,0,0,0.10);
+            border-color: rgba(151,49,0,0.18);
+        }
+
+        .cat-card-img {
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            position: relative;
+            display: block;
+            text-decoration: none;
+            background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.10));
+        }
+
+        .cat-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.45s ease;
+        }
+
+        .cat-card:hover .cat-card-img img {
+            transform: scale(1.06);
+        }
+
+        .cat-card-img-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--on-surface-variant);
+            background: linear-gradient(135deg, var(--surface-container-low), var(--surface-container));
+        }
+
+        .cat-card-img-placeholder .material-symbols-outlined {
+            font-size: 42px;
+            opacity: 0.35;
+        }
+
+        .cat-card-img-placeholder p {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .cat-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(8px);
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.10);
+        }
+
+        .cat-avail {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.85);
+        }
+
+        .cat-avail.on {
+            background: #22c55e;
+        }
+
+        .cat-avail.off {
+            background: #ef4444;
+        }
+
+        .cat-card-size {
+            position: absolute;
+            left: 14px;
+            bottom: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(28,27,27,0.72);
+            color: white;
+            padding: 7px 11px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(6px);
+        }
+
+        .cat-card-size .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .cat-card-body {
+            padding: 18px 18px 20px;
+        }
+
+        .cat-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .cat-card-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            line-height: 1.15;
+            font-weight: 700;
+            color: var(--on-surface);
+            margin: 0;
+        }
+
+        .cat-card-price {
+            flex-shrink: 0;
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .cat-card-sabor {
+            font-size: 13px;
+            color: var(--on-surface-variant);
+            line-height: 1.5;
+            margin: 0 0 14px;
+            min-height: 38px;
+        }
+
+        .cat-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .cat-btn-order {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+            box-shadow: 0 6px 16px rgba(151,49,0,0.18);
+        }
+
+        .cat-btn-order:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .cat-btn-wish {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            border: 1px solid rgba(225,191,180,0.8);
+            background: var(--surface-container-lowest);
+            color: var(--on-surface-variant);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+        }
+
+        .cat-btn-wish:hover {
+            background: var(--surface-container-low);
+            border-color: rgba(151,49,0,0.20);
+            transform: translateY(-1px);
+        }
+
+        .cat-card:hover .cat-badge {
+            transform: translateY(-1px);
+        }
         /* Estilos específicos para el catálogo (grid, hero, filtros) */
         .cat-hero {
             background: linear-gradient(135deg, #3d1f0d 0%, #6b2e18 45%, var(--primary) 100%);
@@ -253,9 +461,6 @@
  
                     <span class="cat-badge">{{ $producto->categoria }}</span>
  
-                    <span class="cat-avail on"
-                          title="Disponible"></span>
- 
                     <div class="cat-card-size">
                         <span class="material-symbols-outlined">people</span>
                         {{ $tamanoShort }}
@@ -279,9 +484,6 @@
                             <span class="material-symbols-outlined" style="font-size:17px;">visibility</span>
                             Ver pastel
                         </a>
-                        <button class="cat-btn-wish" title="Guardar">
-                            <span class="material-symbols-outlined" style="font-size:19px;">favorite_border</span>
-                        </button>
                     </div>
                 </div>
             </div>

@@ -548,36 +548,6 @@ body { background: var(--surface); }
                     </div>
                 </div>
             @endif
-
-            {{-- ══ ADMIN: cambiar estado ══ --}}
-            @if(auth()->user()->role === 'admin' && $pedido->estado !== 'borrador')
-                <div class="det-card">
-                    <div class="det-card-head">
-                        <span class="material-symbols-outlined">tune</span>
-                        <h3>Administrar estado</h3>
-                    </div>
-                    <div class="det-card-body">
-                        <form method="POST" action="{{ route('pedidos.estado', $pedido) }}">
-                            @csrf @method('PATCH')
-                            <label class="fin-label">Nuevo estado</label>
-                            <select name="estado" class="admin-select" required>
-                                @foreach(\App\Models\Pedido::ESTADOS as $key => $label)
-                                    @if($key !== 'borrador')
-                                        <option value="{{ $key }}" @selected($pedido->estado === $key)>
-                                            {{ $label }}
-                                        </option>
-                                    @endif
-                                @endforeach
-                            </select>
-                            <button type="submit" class="btn-primary">
-                                <span class="material-symbols-outlined" style="font-size:17px;">save</span>
-                                Actualizar estado
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            @endif
-
         </div>
     </div>
 </div>
@@ -602,8 +572,7 @@ body { background: var(--surface); }
         </form>
 
         <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--outline-variant);">
-            <form id="form-delete" method="POST"
-                  onsubmit="return confirm('¿Eliminar «' + document.getElementById('modal-nombre').textContent + '» del pedido?')">
+            <form id="form-delete" method="POST">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn-danger">
                     <span class="material-symbols-outlined" style="font-size:16px;">delete</span>

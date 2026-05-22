@@ -205,9 +205,6 @@
                         <span class="material-symbols-outlined">remove_shopping_cart</span> Sin stock
                     </button>
                 @endif
-                <button class="amo-btn-ghost" id="wish-btn">
-                    <span class="material-symbols-outlined" id="wish-icon">favorite_border</span> Guardar en favoritos
-                </button>
             </div>
 
             <div class="det-trust">
@@ -304,14 +301,14 @@
         .det-modal-overlay {
             position: fixed; inset: 0; z-index: 100;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-            display: flex; align-items: flex-end; justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none;
             transition: opacity 0.3s;
         }
         .det-modal-overlay.open { opacity: 1; pointer-events: all; }
         .det-modal {
             background: var(--surface-container-lowest);
-            border-radius: 24px 24px 0 0;
+            border-radius: 24px;
             padding: 32px;
             width: 100%; max-width: 520px;
             transform: translateY(40px);

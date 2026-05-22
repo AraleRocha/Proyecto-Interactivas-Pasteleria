@@ -120,7 +120,7 @@
         .btn-no,
         .btn-detail{
             border:none;
-            border-radius:14px;
+            border-radius:12px;
             padding:10px 14px;
             font-weight:700;
             font-size:13px;
@@ -129,26 +129,52 @@
             display:inline-flex;
             align-items:center;
             gap:8px;
+            transition:all .2s ease;
+            box-shadow:0 2px 8px rgba(0,0,0,.06);
         }
 
         .btn-detail{
             background:var(--surface-container-high);
             color:var(--on-surface);
+            border:1px solid var(--outline-variant);
+        }
+
+        .btn-detail:hover{
+            background:var(--surface-container-highest);
+            transform:translateY(-1px);
         }
 
         .btn-ok{
             background:#dcfce7;
             color:#166534;
+            border:1px solid #bbf7d0;
+        }
+
+        .btn-ok:hover{
+            background:#bbf7d0;
+            transform:translateY(-1px);
         }
 
         .btn-no{
-            background:#fee2e2;
+            background:#fef2f2;
             color:#991b1b;
+            border:1px solid #fecdd3;
+        }
+
+        .btn-no:hover{
+            background:#fee2e2;
+            transform:translateY(-1px);
         }
 
         .btn-soft{
-            background:#dbeafe;
-            color:#1e40af;
+            background:var(--primary-fixed);
+            color:var(--primary);
+            border:1px solid rgba(151,49,0,.12);
+        }
+
+        .btn-soft:hover{
+            background:var(--primary-fixed-dim);
+            transform:translateY(-1px);
         }
 
         .empty{
@@ -252,31 +278,42 @@
                                     </td>
 
                                     <td>
-                                        <div class="btn-row">
-                                            <a href="{{ route('pedidos.show', $pedido) }}" class="btn-detail">
+                                        <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center;flex-wrap:wrap;">
+                                            <a href="{{ route('pedidos.show', $pedido) }}" class="amo-btn-edit">
+                                                <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">visibility</span>
                                                 Ver
                                             </a>
 
                                             @if($pedido->estado === 'por_confirmar')
-                                                <form action="{{ route('pedidos.aprobar', $pedido) }}" method="POST" style="margin:0;">
+                                                <form action="{{ route('pedidos.aprobar', $pedido) }}"
+                                                    method="POST"
+                                                    style="margin:0;">
                                                     @csrf
-                                                    <button type="submit" class="btn-ok">
+                                                    <button type="submit" class="amo-btn-edit">
+                                                        <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">check</span>
                                                         Aprobar
                                                     </button>
                                                 </form>
 
-                                                <form action="{{ route('pedidos.rechazar', $pedido) }}" method="POST" style="margin:0;">
+                                                <form action="{{ route('pedidos.rechazar', $pedido) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('¿Rechazar este pedido?')"
+                                                    style="margin:0;">
                                                     @csrf
-                                                    <button type="submit" class="btn-no" onclick="return confirm('¿Rechazar este pedido?')">
+                                                    <button type="submit" class="amo-btn-del">
+                                                        <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">close</span>
                                                         Rechazar
                                                     </button>
                                                 </form>
                                             @endif
 
                                             @if($pedido->estado === 'horneando')
-                                                <form action="{{ route('pedidos.listo', $pedido) }}" method="POST" style="margin:0;">
+                                                <form action="{{ route('pedidos.listo', $pedido) }}"
+                                                    method="POST"
+                                                    style="margin:0;">
                                                     @csrf
-                                                    <button type="submit" class="btn-soft">
+                                                    <button type="submit" class="amo-btn-edit">
+                                                        <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">done_all</span>
                                                         Listo
                                                     </button>
                                                 </form>

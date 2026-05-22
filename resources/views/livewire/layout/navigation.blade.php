@@ -216,11 +216,11 @@ new class extends Component
                     <span class="material-symbols-outlined">inventory_2</span>
                     Productos
                 </a>
-                <a href="{{ route('productos.index') }}"
-                   class="nav-link {{ request()->routeIs('productos.*') ? 'active' : '' }}"
+                <a href="{{ route('usuarios.index') }}"
+                   class="nav-link {{ request()->routeIs('usuarios.*') ? 'active' : '' }}"
                    wire:navigate>
                     <span class="material-symbols-outlined">inventory_2</span>
-                    Pedidos
+                    Usuarios
                 </a>
             @endif
 

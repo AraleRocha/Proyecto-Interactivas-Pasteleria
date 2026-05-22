@@ -62,20 +62,37 @@
 
             {{-- Toolbar --}}
             <div class="amo-table-toolbar">
-                <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-                    <button class="amo-tab-btn active" onclick="setTab(this,'')">Todos</button>
-                    @foreach(['Boda','Cumpleaños','Bautizo','XV Años','Sin Gluten'] as $cat)
-                        <button class="amo-tab-btn" onclick="setTab(this,'{{ strtolower($cat) }}')">{{ $cat }}</button>
-                    @endforeach
-                </div>
+                <div></div>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                    <select class="amo-filter-select" id="filter-disponible" onchange="filtrarTabla()">
-                        <option value="">Todos los estados</option>
-                        <option value="1">Disponible</option>
-                        <option value="0">No disponible</option>
-                    </select>
-                    <button class="amo-icon-btn"><span class="material-symbols-outlined">filter_list</span></button>
-                    <button class="amo-icon-btn"><span class="material-symbols-outlined">download</span></button>
+                    <form method="GET" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                        <select class="amo-filter-select" id="filter-categoria" name="categoria" onchange="filtrarTabla()">
+                            <option value="">Todas las categorías</option>
+                            @foreach(['Boda','Cumpleaños','Bautizo','XV Años','Sin Gluten'] as $cat)
+                                <option value="{{ $cat }}" @selected(request('categoria') === $cat)>
+                                    {{ $cat }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <button
+                            type="submit"
+                            formaction="{{ route('reportes.pasteles.stream') }}"
+                            formtarget="_blank"
+                            class="amo-icon-btn"
+                            title="Ver reporte"
+                        >
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+
+                        <button
+                            type="submit"
+                            formaction="{{ route('reportes.pasteles.descargar') }}"
+                            class="amo-icon-btn"
+                            title="Descargar PDF"
+                        >
+                            <span class="material-symbols-outlined">download</span>
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -211,30 +228,22 @@
     </main>
 
     <script>
-        let activeCategoria = '';
-
-        function setTab(btn, cat) {
-            document.querySelectorAll('.amo-tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            activeCategoria = cat;
-            filtrarTabla();
-        }
-
         function filtrarTabla() {
-            const search     = document.getElementById('search-input')?.value.toLowerCase() ?? '';
-            const disponible = document.getElementById('filter-disponible').value;
-            const rows       = document.querySelectorAll('#tabla-productos tbody tr[data-nombre]');
+            const search = document.getElementById('search-input')?.value.toLowerCase() ?? '';
+            const categoria = document.getElementById('filter-categoria').value.toLowerCase();
+            const disponible = document.getElementById('filter-disponible')?.value ?? '';
+            const rows = document.querySelectorAll('#tabla-productos tbody tr[data-nombre]');
 
             rows.forEach(row => {
-                const nombre    = row.dataset.nombre    || '';
-                const categoria = row.dataset.categoria || '';
-                const rowDisp   = row.dataset.disponible|| '';
+                const nombre = row.dataset.nombre || '';
+                const rowCategoria = row.dataset.categoria || '';
+                const rowDisp = row.dataset.disponible || '';
 
-                const matchSearch     = nombre.includes(search);
+                const matchSearch = nombre.includes(search);
+                const matchCategoria = categoria === '' || rowCategoria.includes(categoria);
                 const matchDisponible = disponible === '' || rowDisp === disponible;
-                const matchCategoria  = activeCategoria === '' || categoria.includes(activeCategoria);
 
-                row.style.display = matchSearch && matchDisponible && matchCategoria ? '' : 'none';
+                row.style.display = matchSearch && matchCategoria && matchDisponible ? '' : 'none';
             });
         }
     </script>
