@@ -1,14 +1,6 @@
-# API REST — Amoretti Pastelería
+# API REST
 
 **Base URL:** `http://localhost:8000/api`
-
-Las rutas marcadas * requieren:
-```
-Authorization: Bearer {token}
-Accept: application/json
-```
-
----
 
 ## Endpoints
 
@@ -101,7 +93,7 @@ Detalle de un pastel específico.
 
 ---
 
-### 4. `POST /api/pedidos` *
+### 4. `POST /api/pedidos` *(autenticacion)*
 Agrega un producto al pedido en borrador del cliente.
 Si no existe borrador, se crea automáticamente.
 

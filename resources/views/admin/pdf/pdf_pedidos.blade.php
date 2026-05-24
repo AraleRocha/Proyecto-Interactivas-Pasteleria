@@ -100,7 +100,6 @@
 </head>
 <body>
 
-    {{-- Header --}}
     <div class="header">
         <div class="header-row">
             <div class="hl">

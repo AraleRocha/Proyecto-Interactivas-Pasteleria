@@ -1,13 +1,8 @@
 <x-app-layout :title="__('Editar Pastel')">
-    <x-amo-styles />
-
-    {{-- ══════ MAIN ══════ --}}
     <main class="amo-main">
-
-        {{-- Breadcrumb + Title --}}
         <div style="margin-bottom:28px;">
             <nav class="amo-breadcrumb">
-                <a href="{{ route('productos.index') }}">Inventario</a>
+                <a href="{{ route('admin.productos.index') }}">Inventario</a>
                 <span class="material-symbols-outlined" style="font-size:15px;">chevron_right</span>
                 <span class="current">Editar Pastel</span>
             </nav>
@@ -51,7 +46,7 @@
         @endif
 
         {{-- BENTO GRID --}}
-        <form action="{{ route('productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -304,12 +299,12 @@
                             <span class="material-symbols-outlined" style="font-size:20px;">save</span>
                             Guardar Cambios
                         </button>
-                        <a href="{{ route('productos.index') }}" class="amo-btn-ghost">
+                        <a href="{{ route('admin.productos.index') }}" class="amo-btn-ghost">
                             Cancelar
                         </a>
                     </div>
-                </div>{{-- /right --}}
-            </div>{{-- /grid --}}
+                </div>
+            </div>
         </form>
     </main>
 
@@ -334,7 +329,7 @@
         zone.addEventListener('dragleave', ()  => { zone.style.borderColor = ''; zone.style.background = ''; });
         zone.addEventListener('drop',      ()  => { zone.style.borderColor = ''; zone.style.background = ''; });
 
-        // Si marcan eliminar → limpiar preview
+        // Si marcan eliminar: limpiar preview
         const chkEliminar = document.getElementById('eliminar_imagen');
         if (chkEliminar) {
             chkEliminar.addEventListener('change', () => {

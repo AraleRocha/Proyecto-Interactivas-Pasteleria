@@ -1,12 +1,10 @@
 <x-app-layout :title="auth()->user()->role === 'admin' ? 'Pedidos' : 'Mis pedidos'">
-<x-amo-styles />
 
 <style>
 body { background: var(--surface); }
 
 .ped-wrap { max-width: 1080px; margin: 0 auto; padding: 40px 32px 80px; }
 
-/* ── header ── */
 .ped-title {
     font-family: 'Playfair Display', serif;
     font-size: clamp(28px,4vw,42px); font-weight: 700;
@@ -14,7 +12,6 @@ body { background: var(--surface); }
 }
 .ped-sub { font-size: 15px; color: var(--on-surface-variant); margin-bottom: 36px; }
 
-/* ── flash ── */
 .flash {
     display: flex; align-items: center; gap: 8px;
     padding: 12px 18px; border-radius: 12px; font-size: 14px; margin-bottom: 24px;
@@ -22,7 +19,6 @@ body { background: var(--surface); }
 .flash.ok    { background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; }
 .flash.error { background:#fef2f2; border:1px solid #fecdd3; color:#991b1b; }
 
-/* ── borrador banner ── */
 .borrador-banner {
     background: var(--surface-container-lowest);
     border: 2px dashed var(--outline-variant);
@@ -47,7 +43,6 @@ body { background: var(--surface); }
 }
 .borrador-meta { font-size: 13px; color: var(--on-surface-variant); margin-top: 2px; }
 
-/* ── grid de pedidos ── */
 .ped-grid { display: grid; gap: 16px; }
 
 .ped-card {
@@ -79,7 +74,6 @@ body { background: var(--surface); }
 .ped-meta span { display: flex; align-items: center; gap: 4px; }
 .ped-meta .material-symbols-outlined { font-size: 14px; }
 
-/* badge estado */
 .estado-badge {
     padding: 8px 16px; border-radius: 9999px;
     font-size: 12px; font-weight: 700; white-space: nowrap;
@@ -94,7 +88,6 @@ body { background: var(--surface); }
 .est-entregado  { background:#dcfce7; color:#166534; } .est-entregado  .estado-dot { background:#22c55e; }
 .est-cancelado  { background:#fee2e2; color:#991b1b; } .est-cancelado  .estado-dot { background:#ef4444; }
 
-/* productos mini */
 .ped-card-body { padding: 16px 24px; display: flex; flex-direction: column; gap: 8px; }
 .ped-mini-item {
     display: flex; justify-content: space-between; align-items: center;
@@ -109,7 +102,6 @@ body { background: var(--surface); }
     display: flex; align-items: center; justify-content: flex-end; gap: 10px;
 }
 
-/* botones */
 .btn-primary {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 10px 20px; border-radius: 10px;
@@ -128,7 +120,6 @@ body { background: var(--surface); }
 }
 .btn-ghost:hover { background: var(--surface-container-highest); }
 
-/* vacío */
 .ped-empty {
     padding: 72px 24px; text-align: center;
     background: var(--surface-container-lowest);
@@ -169,7 +160,7 @@ body { background: var(--surface); }
         </div>
     @endif
 
-    {{-- ── BORRADOR ACTIVO (cliente) ── --}}
+    {{-- borrador (cliente) --}}
     @if($pedidoBorrador)
         <div class="borrador-banner">
             <div class="borrador-left">
@@ -185,14 +176,14 @@ body { background: var(--surface); }
                     </p>
                 </div>
             </div>
-            <a href="{{ route('pedidos.show', $pedidoBorrador) }}" class="btn-primary">
+            <a href="{{ route('client.pedidos.show', $pedidoBorrador) }}" class="btn-primary">
                 <span class="material-symbols-outlined" style="font-size:18px;">edit_note</span>
                 Ver y finalizar pedido
             </a>
         </div>
     @endif
 
-    {{-- ── LISTADO ── --}}
+    {{-- lista  --}}
     @if($pedidos->count())
         <div class="ped-grid">
             @foreach($pedidos as $pedido)
@@ -245,7 +236,7 @@ body { background: var(--surface); }
                         </div>
 
                         <div class="ped-card-foot">
-                            <a href="{{ route('pedidos.show', $pedido) }}" class="btn-primary">
+                            <a href="{{ route('client.pedidos.show', $pedido) }}" class="btn-primary">
                                 <span class="material-symbols-outlined" style="font-size:16px;">visibility</span>
                                 Ver detalle
                             </a>
@@ -262,11 +253,13 @@ body { background: var(--surface); }
             <span class="material-symbols-outlined">receipt_long</span>
             <h2>Aún no hay pedidos</h2>
             <p style="margin-bottom:20px;">Cuando realices un pedido aparecerá aquí.</p>
-            <a href="{{ route('catalogo.index') }}" class="btn-primary">
+            <a href="{{ route('client.catalogo.index') }}" class="btn-primary">
                 <span class="material-symbols-outlined" style="font-size:17px;">storefront</span>
                 Ir al catálogo
             </a>
         </div>
     @endif
 </div>
+    {{-- Chatbot --}}
+    @include('components.chatbot')
 </x-app-layout>

@@ -197,9 +197,9 @@
 @endif
 
 @php
-    $totalProductos   = $productos->count();
+    $totalProductos = $productos->count();
     $totalDisponibles = $productos->where('disponible', true)->count();
-    $sinStock         = $productos->where('stock', 0)->count();
+    $sinStock = $productos->where('stock', 0)->count();
     $valorInventario  = $productos->sum(fn($p) => $p->precio * $p->stock);
 @endphp
 

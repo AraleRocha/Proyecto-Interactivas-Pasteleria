@@ -1,6 +1,4 @@
 <x-app-layout title="Nuevo usuario">
-    <x-amo-styles />
-
     <style>
         .adm-wrap{max-width:900px;margin:0 auto;padding:24px;}
         .adm-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,42px);font-weight:700;margin:0 0 6px;}
@@ -29,7 +27,7 @@
         <p class="adm-sub">Crea una cuenta para cliente o administrador.</p>
 
         <div class="adm-card">
-            <form action="{{ route('usuarios.store') }}" method="POST">
+            <form action="{{ route('admin.usuarios.store') }}" method="POST">
                 @csrf
 
                 <div class="form-grid">
@@ -68,7 +66,7 @@
 
                 <div class="actions">
                     <button type="submit" class="btn-primary">Guardar usuario</button>
-                    <a href="{{ route('usuarios.index') }}" class="btn-ghost">Cancelar</a>
+                    <a href="{{ route('admin.usuarios.index') }}" class="btn-ghost">Cancelar</a>
                 </div>
             </form>
         </div>

@@ -1,6 +1,4 @@
 <x-app-layout title="Pedidos">
-    <x-amo-styles />
-
     <style>
         .adm-wrap{
             max-width: 1280px;
@@ -279,13 +277,13 @@
 
                                     <td>
                                         <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center;flex-wrap:wrap;">
-                                            <a href="{{ route('pedidos.show', $pedido) }}" class="amo-btn-edit">
+                                            <a href="{{ route('admin.pedidos.show', $pedido) }}" class="amo-btn-edit">
                                                 <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">visibility</span>
                                                 Ver
                                             </a>
 
                                             @if($pedido->estado === 'por_confirmar')
-                                                <form action="{{ route('pedidos.aprobar', $pedido) }}"
+                                                <form action="{{ route('admin.pedidos.aprobar', $pedido) }}"
                                                     method="POST"
                                                     style="margin:0;">
                                                     @csrf
@@ -295,20 +293,29 @@
                                                     </button>
                                                 </form>
 
-                                                <form action="{{ route('pedidos.rechazar', $pedido) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('¿Rechazar este pedido?')"
-                                                    style="margin:0;">
+                                                <form method="POST" style="margin:0;">
                                                     @csrf
-                                                    <button type="submit" class="amo-btn-del">
-                                                        <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">close</span>
+
+                                                    <button type="button"
+                                                        class="amo-btn-del"
+                                                        onclick="prepararEliminacion(
+                                                            '{{ route('admin.pedidos.rechazar', $pedido) }}',
+                                                            '¿Rechazar este pedido?',
+                                                            'POST'
+                                                        )">
+
+                                                        <span class="material-symbols-outlined"
+                                                            style="font-size:15px;margin-right:4px;">
+                                                            close
+                                                        </span>
+
                                                         Rechazar
                                                     </button>
                                                 </form>
                                             @endif
 
                                             @if($pedido->estado === 'horneando')
-                                                <form action="{{ route('pedidos.listo', $pedido) }}"
+                                                <form action="{{ route('admin.pedidos.listo', $pedido) }}"
                                                     method="POST"
                                                     style="margin:0;">
                                                     @csrf
@@ -337,3 +344,4 @@
         @endif
     </div>
 </x-app-layout>
+

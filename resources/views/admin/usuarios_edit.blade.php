@@ -1,6 +1,4 @@
 <x-app-layout title="Editar usuario">
-    <x-amo-styles />
-
     <style>
         .adm-wrap{max-width:900px;margin:0 auto;padding:24px;}
         .adm-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,42px);font-weight:700;margin:0 0 6px;}
@@ -29,7 +27,7 @@
         <p class="adm-sub">Actualiza datos, rol o contraseña.</p>
 
         <div class="adm-card">
-            <form action="{{ route('usuarios.update', $usuario) }}" method="POST">
+            <form action="{{ route('admin.usuarios.update', $usuario) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -69,7 +67,7 @@
 
                 <div class="actions">
                     <button type="submit" class="btn-primary">Guardar cambios</button>
-                    <a href="{{ route('usuarios.index', $usuario) }}" class="btn-ghost">Cancelar</a>
+                    <a href="{{ route('admin.usuarios.index', $usuario) }}" class="btn-ghost">Cancelar</a>
                 </div>
             </form>
         </div>

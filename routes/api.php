@@ -3,21 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApiController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes — Amoretti
-| Autenticación: Laravel Sanctum
-| Header requerido en rutas 🔒: Authorization: Bearer {token}
-|                                Accept: application/json
-|--------------------------------------------------------------------------
-*/
+/*Rutas de las apis*/
 
-// ── PÚBLICAS ───────────────────────────────────────────────────────────
-Route::post('/login',           [ApiController::class, 'login']);
-Route::get ('/productos',       [ApiController::class, 'catalogo']);
-Route::get ('/productos/{id}',  [ApiController::class, 'detalle']);
+// Publicas
+Route::post('/login', [ApiController::class, 'login']);
+Route::get ('/productos', [ApiController::class, 'catalogo']);
+Route::get ('/productos/{id}', [ApiController::class, 'detalle']);
 
-// ── PROTEGIDAS con Sanctum ─────────────────────────────────────────────
+// protegidas
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/pedidos', [ApiController::class, 'agregarPedido']);
 });

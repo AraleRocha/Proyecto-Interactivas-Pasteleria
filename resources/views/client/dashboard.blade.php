@@ -1,6 +1,4 @@
 <x-app-layout title="Mi Dashboard">
-    <x-amo-styles />
-
     <div style="max-width:1200px;margin:0 auto;padding:24px;">
         <h1 style="font-family:'Playfair Display',serif;font-size:clamp(30px,4vw,46px);font-weight:700;margin:0;">
             Mi dashboard
@@ -50,4 +48,6 @@
             }
         });
     </script>
+    {{-- Chatbot --}}
+    @include('components.chatbot')
 </x-app-layout>

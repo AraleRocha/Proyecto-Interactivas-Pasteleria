@@ -1,6 +1,4 @@
 <x-app-layout title="Usuarios">
-    <x-amo-styles />
-
     <style>
         .adm-wrap{
             max-width: 1280px;
@@ -170,7 +168,7 @@
                 <p class="adm-sub">Listado general de cuentas registradas.</p>
             </div>
 
-            <a href="{{ route('usuarios.create') }}" class="btn-create">
+            <a href="{{ route('admin.usuarios.create') }}" class="btn-create">
                 <span class="material-symbols-outlined" style="font-size:18px;">person_add</span>
                 Nuevo usuario
             </a>
@@ -229,20 +227,27 @@
 
                                     <td style="text-align:right;">
                                         <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center;">
-                                            <a href="{{ route('usuarios.edit', $usuario) }}" class="amo-btn-edit">
+                                            <a href="{{ route('admin.usuarios.edit', $usuario) }}" class="amo-btn-edit">
                                                 <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">edit</span>
                                                 Editar
                                             </a>
 
-                                            <form action="{{ route('usuarios.destroy', $usuario) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('¿Eliminar este usuario?')"
-                                                style="margin:0;">
+                                            <form method="POST" style="margin:0;">
                                                 @csrf
-                                                @method('DELETE')
 
-                                                <button type="submit" class="amo-btn-del">
-                                                    <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">delete</span>
+                                                <button type="button"
+                                                    class="amo-btn-del"
+                                                    onclick="prepararEliminacion(
+                                                        '{{ route('admin.usuarios.destroy', $usuario) }}',
+                                                        '¿Eliminar al usuario {{ $usuario->name }}?',
+                                                        'DELETE'
+                                                    )">
+
+                                                    <span class="material-symbols-outlined"
+                                                        style="font-size:15px;margin-right:4px;">
+                                                        delete
+                                                    </span>
+
                                                     Eliminar
                                                 </button>
                                             </form>
@@ -265,3 +270,4 @@
         @endif
     </div>
 </x-app-layout>
+

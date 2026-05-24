@@ -11,10 +11,6 @@ Ahora ya puedes:
 - Dar seguimiento a tus compras
 - Descubrir nuevas colecciones y sabores
 
-<x-mail::button :url="url('/catalogo')">
-Ver Catálogo
-</x-mail::button>
-
 Gracias por formar parte de **Amoretti Pastelería**.  
 Esperamos acompañarte en tus momentos más especiales. 💖
 

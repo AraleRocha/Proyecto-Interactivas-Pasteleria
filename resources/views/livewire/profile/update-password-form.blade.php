@@ -38,42 +38,156 @@ new class extends Component
     }
 }; ?>
 
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Update Password') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Ensure your account is using a long, random password to stay secure.') }}
-        </p>
-    </header>
-
-    <form wire:submit="updatePassword" class="mt-6 space-y-6">
+<section class="amo-card" style="max-width:820px;margin:auto;">
+    <div class="amo-card-header">
+        <span class="material-symbols-outlined"
+              style="color:var(--primary);">
+            lock
+        </span>
         <div>
-            <x-input-label for="update_password_current_password" :value="__('Current Password')" />
-            <x-text-input wire:model="current_password" id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
-            <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
+            <h3>Cambiar contraseña</h3>
+            <p style="
+                font-size:13px;
+                color:var(--on-surface-variant);
+                margin-top:2px;
+            ">
+                Mantén tu cuenta protegida utilizando una contraseña segura.
+            </p>
         </div>
+    </div>
 
-        <div>
-            <x-input-label for="update_password_password" :value="__('New Password')" />
-            <x-text-input wire:model="password" id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+    <div class="amo-card-body">
+        <form wire:submit="updatePassword">
+            <div class="amo-grid-2">
+                {{-- Contraseña actual --}}
+                <div class="amo-col-span-2">
+                    <label
+                        for="update_password_current_password"
+                        class="amo-label">
+                        Contraseña actual
+                    </label>
+                    <input
+                        wire:model="current_password"
+                        id="update_password_current_password"
+                        name="current_password"
+                        type="password"
+                        class="amo-input"
+                        autocomplete="current-password">
 
-        <div>
-            <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input wire:model="password_confirmation" id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            <x-action-message class="me-3" on="password-updated">
-                {{ __('Saved.') }}
-            </x-action-message>
-        </div>
-    </form>
+                    @error('current_password')
+                        <p class="amo-error-msg">
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+                {{-- Nueva contraseña --}}
+                <div>
+                    <label
+                        for="update_password_password"
+                        class="amo-label">
+                        Nueva contraseña
+                    </label>
+                    <input
+                        wire:model="password"
+                        id="update_password_password"
+                        name="password"
+                        type="password"
+                        class="amo-input"
+                        autocomplete="new-password">
+                    @error('password')
+                        <p class="amo-error-msg">
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+                {{-- Confirmación --}}
+                <div>
+                    <label
+                        for="update_password_password_confirmation"
+                        class="amo-label">
+                        Confirmar contraseña
+                    </label>
+                    <input
+                        wire:model="password_confirmation"
+                        id="update_password_password_confirmation"
+                        name="password_confirmation"
+                        type="password"
+                        class="amo-input"
+                        autocomplete="new-password">
+                    @error('password_confirmation')
+                        <p class="amo-error-msg">
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+            </div>
+            {{-- Tips --}}
+            <div style="
+                margin-top:22px;
+                padding:18px;
+                border-radius:18px;
+                background:rgba(151,49,0,0.04);
+                border:1px solid rgba(225,191,180,0.5);
+            ">
+                <div style="
+                    display:flex;
+                    gap:14px;
+                    align-items:flex-start;
+                ">
+                    <span class="material-symbols-outlined"
+                          style="
+                            color:var(--primary);
+                            font-size:28px;
+                          ">
+                        shield_lock
+                    </span>
+                    <div>
+                        <p style="
+                            font-weight:600;
+                            margin-bottom:6px;
+                            color:var(--on-surface);
+                        ">
+                            Recomendaciones de seguridad
+                        </p>
+                        <ul style="
+                            margin:0;
+                            padding-left:18px;
+                            color:var(--on-surface-variant);
+                            line-height:1.8;
+                            font-size:14px;
+                        ">
+                            <li>Utiliza al menos 8 caracteres.</li>
+                            <li>Combina letras, números y símbolos.</li>
+                            <li>No reutilices contraseñas anteriores.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {{-- Botón --}}
+            <div style="
+                display:flex;
+                align-items:center;
+                gap:14px;
+                margin-top:28px;
+            ">
+                <button
+                    type="submit"
+                    class="amo-btn-primary">
+                    <span class="material-symbols-outlined">
+                        encrypted
+                    </span>
+                    Actualizar contraseña
+                </button>
+                <x-action-message on="password-updated">
+                    <span style="
+                        color:#15803d;
+                        font-size:14px;
+                        font-weight:600;
+                    ">
+                        Contraseña actualizada correctamente
+                    </span>
+                </x-action-message>
+            </div>
+        </form>
+    </div>
 </section>

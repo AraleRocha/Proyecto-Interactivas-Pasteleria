@@ -213,7 +213,7 @@ body { background: var(--surface); }
 <div class="cart-wrap">
 
     <nav class="cart-breadcrumb">
-        <a href="{{ route('catalogo.index') }}">Catálogo</a>
+        <a href="{{ route('client.catalogo.index') }}">Catálogo</a>
         <span class="material-symbols-outlined" style="font-size:15px;">chevron_right</span>
         <span>Mi carrito</span>
     </nav>
@@ -247,11 +247,22 @@ body { background: var(--surface); }
             <div class="cart-card-head">
                 <h2>Productos</h2>
                 @if(count($carrito))
-                    <form method="POST" action="{{ route('carrito.vaciar') }}"
-                          onsubmit="return confirm('¿Vaciar todo el carrito?')">
-                        @csrf @method('DELETE')
-                        <button class="cart-vaciar-btn">
-                            <span class="material-symbols-outlined" style="font-size:16px;">delete_sweep</span>
+                    <form method="POST">
+                        @csrf
+
+                        <button type="button"
+                            class="cart-vaciar-btn"
+                            onclick="prepararEliminacion(
+                                '{{ route('client.carrito.vaciar') }}',
+                                '¿Vaciar todo el carrito?',
+                                'DELETE'
+                            )">
+
+                            <span class="material-symbols-outlined"
+                                style="font-size:16px;">
+                                delete_sweep
+                            </span>
+
                             Vaciar carrito
                         </button>
                     </form>
@@ -318,7 +329,7 @@ body { background: var(--surface); }
                 <div class="cart-empty">
                     <span class="material-symbols-outlined">shopping_bag</span>
                     <p style="margin-bottom:20px;">Tu carrito está vacío</p>
-                    <a href="{{ route('catalogo.index') }}" class="amo-btn-primary">
+                    <a href="{{ route('client.catalogo.index') }}" class="amo-btn-primary">
                         <span class="material-symbols-outlined" style="font-size:18px;">storefront</span>
                         Explorar catálogo
                     </a>
@@ -351,14 +362,13 @@ body { background: var(--surface); }
                 <button class="cart-checkout-btn" disabled>Confirmar pedido</button>
             @endif
 
-            <a href="{{ route('catalogo.index') }}" class="cart-back">
+            <a href="{{ route('client.catalogo.index') }}" class="cart-back">
                 <span class="material-symbols-outlined" style="font-size:15px;">arrow_back</span>
                 Seguir comprando
             </a>
 
             <div class="trust-strip">
                 <div class="trust-item"><span class="material-symbols-outlined">verified</span> Ingredientes naturales</div>
-                <div class="trust-item"><span class="material-symbols-outlined">local_shipping</span> Entrega en SLP</div>
                 <div class="trust-item"><span class="material-symbols-outlined">schedule</span> Anticipo mínimo 48 h</div>
             </div>
         </div>

@@ -17,17 +17,13 @@ class catalogoController extends Controller
         return view('client.catalogo', compact('productos'));
     }
  
-    /**
-     * Detalle público de un pastel.
-     * Si no está disponible o sin stock → 404.
-     */
+    /* Detalle público de un pastel*/
     public function show(string $id)
     {
         $producto = producto::where('id', $id)
             ->where('disponible', true)
             ->firstOrFail();
  
-        // Sugerencias: misma categoría, excluyendo el actual
         $sugerencias = Producto::where('disponible', true)
             ->where('stock', '>', 0)
             ->where('categoria', $producto->categoria)

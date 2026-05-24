@@ -1,15 +1,7 @@
-{{--
-    Componente de estilos compartidos para el módulo de productos.
-    Uso: <x-amo-styles />
-    Coloca este archivo en: resources/views/components/amo-styles.blade.php
---}}
-
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 
 <style>
-    /* ══════════════════════════════════════
-       TOKENS
-    ══════════════════════════════════════ */
+    /* TOKENS */
     :root {
         --primary:                  #973100;
         --primary-container:        #c04000;
@@ -31,10 +23,87 @@
         --on-tertiary-fixed:        #1e1b13;
         --error:                    #ba1a1a;
     }
+    /* MODAL */
+    .modal-overlay{
+        position: fixed; inset: 0; background: rgba(28, 27, 27, 0.58);
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex;
+        align-items: center; justify-content: center; z-index: 9999; padding: 20px;
+        opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .22s ease, visibility .22s ease;
+    }
 
-    /* ══════════════════════════════════════
-       BASE
-    ══════════════════════════════════════ */
+    .modal-overlay.open{
+        opacity: 1; visibility: visible;
+        pointer-events: auto;
+    }
+
+    .modal-box{
+        width: 100%; max-width: 460px; background: var(--surface-container-lowest);
+        border: 1px solid rgba(225, 191, 180, 0.55); border-radius: 28px; padding: 28px;
+        position: relative;
+        box-shadow:
+            0 24px 60px rgba(61, 31, 13, 0.22),
+            0 2px 10px rgba(0,0,0,0.05);
+        transform: translateY(14px) scale(.98); transition: transform .22s ease, box-shadow .22s ease;
+    }
+
+    .modal-overlay.open .modal-box{
+        transform: translateY(0) scale(1);
+    }
+
+    .modal-handle{
+        width: 46px; height: 5px; border-radius: 999px;
+        background: linear-gradient(90deg, var(--primary-fixed), var(--outline-variant));
+        margin: 0 auto 18px;
+    }
+
+    .modal-close{
+        position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border: none;
+        border-radius: 50%; background: var(--surface-container-low); color: var(--on-surface-variant);
+        cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+        font-size: 20px; line-height: 1; transition: background .18s ease, transform .18s ease, color .18s ease;
+    }
+
+    .modal-close:hover{
+        background: var(--surface-container); color: var(--on-surface);
+        transform: scale(1.05);
+    }
+
+    .modal-title{
+        font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700;
+        color: var(--on-surface); margin: 0 0 8px; line-height: 1.15;
+    }
+
+    .modal-sub{
+        font-size: 14px; color: var(--on-surface-variant); line-height: 1.65;
+        margin-bottom: 22px;
+    }
+
+    .btn-danger{
+        width: 100%; border: none; border-radius: 14px; padding: 14px 16px; font-weight: 700; font-size: 14px;
+        cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+        gap: 8px; transition: transform .15s ease, opacity .15s ease, background .15s ease; box-shadow: 0 8px 18px rgba(220, 38, 38, 0.18);
+    }
+
+    .btn-danger:hover{
+        transform: translateY(-1px); opacity: .96;
+    }
+
+    .btn-danger:active{
+        transform: translateY(0);
+    }
+
+    @media (max-width: 640px){
+        .modal-box{
+            max-width: 100%;
+            padding: 24px 20px;
+            border-radius: 24px;
+        }
+
+        .modal-title{
+            font-size: 22px;
+        }
+    }
+    /* BASE */
     body {
         background-color: var(--surface);
         color: var(--on-surface);
@@ -45,9 +114,7 @@
         vertical-align: middle;
     }
 
-    /* ══════════════════════════════════════
-       SIDEBAR
-    ══════════════════════════════════════ */
+    /* SIDEBAR */
     .amo-sidebar {
         position: fixed; left: 0; top: 0; height: 100%; width: 256px;
         background: var(--surface-container-lowest);
@@ -90,9 +157,7 @@
         overflow: hidden; flex-shrink: 0;
     }
 
-    /* ══════════════════════════════════════
-       HEADER
-    ══════════════════════════════════════ */
+    /*  HEADER */
     .amo-header {
         position: sticky; top: 0; z-index: 40;
         background: rgba(252,249,248,0.85); backdrop-filter: blur(12px);
@@ -122,14 +187,10 @@
     }
     .amo-icon-btn:hover { background: var(--surface-container-low); }
 
-    /* ══════════════════════════════════════
-       MAIN / LAYOUT
-    ══════════════════════════════════════ */
+    /* MAIN / LAYOUT */
     .amo-main { padding: 32px; min-height: 100vh; }
 
-    /* ══════════════════════════════════════
-       BREADCRUMB
-    ══════════════════════════════════════ */
+    /* BREADCRUMB */
     .amo-breadcrumb {
         display: flex; align-items: center; gap: 6px;
         font-size: 12px; color: var(--on-surface-variant); margin-bottom: 8px;
@@ -138,9 +199,7 @@
     .amo-breadcrumb a:hover { color: var(--primary); }
     .amo-breadcrumb .current { color: var(--primary); font-weight: 600; }
 
-    /* ══════════════════════════════════════
-       SECTION CARD
-    ══════════════════════════════════════ */
+    /* SECTION CARD */
     .amo-card {
         background: var(--surface-container-lowest);
         border-radius: 12px;
@@ -157,9 +216,7 @@
     }
     .amo-card-body { padding: 24px 28px; }
 
-    /* ══════════════════════════════════════
-       FORM FIELDS
-    ══════════════════════════════════════ */
+    /* FORM FIELDS */
     .amo-label {
         display: block; font-size: 13px; font-weight: 600;
         letter-spacing: 0.04em; color: var(--on-surface-variant); margin-bottom: 6px;
@@ -185,9 +242,6 @@
     .amo-input-prefix .amo-input { padding-left: 28px; }
     .amo-error-msg { font-size: 12px; color: var(--error); margin-top: 4px; }
 
-    /* ══════════════════════════════════════
-       GRID HELPERS
-    ══════════════════════════════════════ */
     .amo-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .amo-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
     .amo-col-span-2 { grid-column: span 2; }
@@ -196,9 +250,7 @@
         .amo-col-span-2 { grid-column: span 1; }
     }
 
-    /* ══════════════════════════════════════
-       IMAGE DROP ZONE
-    ══════════════════════════════════════ */
+    /* IMAGE DROP ZONE */
     .amo-drop-zone {
         position: relative; min-height: 180px; border-radius: 12px;
         border: 2px dashed rgba(225,191,180,0.7);
@@ -214,9 +266,7 @@
     .amo-drop-zone:hover .drop-icon { color: var(--primary); }
     #preview-img { max-height: 160px; border-radius: 8px; object-fit: contain; }
 
-    /* ══════════════════════════════════════
-       TOGGLE / SWITCH
-    ══════════════════════════════════════ */
+    /* TOGGLE / SWITCH */
     .amo-toggle-wrap {
         display: flex; justify-content: space-between; align-items: center;
         padding: 14px 16px; background: var(--surface); border-radius: 8px;
@@ -239,9 +289,7 @@
     }
     .amo-switch input:checked + .amo-switch-track::after { transform: translateX(20px); }
 
-    /* ══════════════════════════════════════
-       BUTTONS
-    ══════════════════════════════════════ */
+    /* BUTTONS */
     .amo-btn-primary {
         display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         background: var(--primary); color: var(--on-primary);
@@ -287,9 +335,6 @@
     .amo-btn-del { border-color: #fecdd3; background: var(--surface-container-lowest); color: var(--error); }
     .amo-btn-del:hover { background: #fef2f2; }
 
-    /* ══════════════════════════════════════
-       BANNERS / FLASH
-    ══════════════════════════════════════ */
     .amo-error-banner {
         background: #fef2f2; border: 1px solid #fecdd3;
         border-radius: 10px; padding: 14px 18px;
@@ -304,24 +349,7 @@
         font-size: 14px; margin-bottom: 20px;
     }
 
-    /* ══════════════════════════════════════
-       METRIC CARDS (index)
-    ══════════════════════════════════════ */
-    .amo-metric-card {
-        background: var(--surface-container-lowest);
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-        padding: 24px;
-        display: flex; flex-direction: column; gap: 8px;
-    }
-    .amo-metric-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--secondary); }
-    .amo-metric-value { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: var(--on-surface); line-height: 1; }
-    .amo-metric-value.primary { color: var(--primary); }
-    .amo-metric-sub { font-size: 12px; display: flex; align-items: center; gap: 4px; }
-
-    /* ══════════════════════════════════════
-       TABLE (index)
-    ══════════════════════════════════════ */
+    /* TABLE (index) */
     .amo-table-card {
         background: var(--surface-container-lowest);
         border-radius: 12px;
@@ -355,9 +383,6 @@
     tbody tr:hover { background: rgba(246,243,242,0.6); }
     tbody td { padding: 14px 20px; font-size: 14px; }
 
-    /* ══════════════════════════════════════
-       BADGES
-    ══════════════════════════════════════ */
     .amo-badge {
         display: inline-flex; align-items: center;
         padding: 2px 10px; border-radius: 9999px;
@@ -379,16 +404,11 @@
     .amo-status-off { background: #fef2f2; color: #991b1b; }
     .amo-status-off .amo-status-dot { background: #ef4444; }
 
-    /* ══════════════════════════════════════
-       STOCK BAR (index)
-    ══════════════════════════════════════ */
     .amo-stock-bar { display: flex; align-items: center; gap: 8px; }
     .amo-bar-track { width: 56px; height: 4px; background: var(--surface-container); border-radius: 9999px; overflow: hidden; }
     .amo-bar-fill  { height: 100%; background: var(--primary); border-radius: 9999px; }
 
-    /* ══════════════════════════════════════
-       PAGINATION (index)
-    ══════════════════════════════════════ */
+    /* PAGINATION (index) */
     .amo-pagination {
         padding: 12px 24px;
         border-top: 1px solid rgba(123,85,81,0.1);
@@ -414,26 +434,7 @@
     .amo-page-nav:disabled { opacity: 0.35; cursor: not-allowed; }
     .amo-page-nav:not(:disabled):hover { background: var(--surface-container-low); }
 
-    /* ══════════════════════════════════════
-       SEARCH / FILTER INPUTS (index)
-    ══════════════════════════════════════ */
-    .amo-filter-input, .amo-filter-select {
-        padding: 8px 14px;
-        border: 1px solid var(--outline-variant);
-        border-radius: 8px; font-size: 14px;
-        background: var(--surface-container-lowest);
-        color: var(--on-surface);
-        outline: none; transition: border 0.2s;
-    }
-    .amo-filter-input:focus,
-    .amo-filter-select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 2px rgba(151,49,0,0.12);
-    }
-
-    /* ══════════════════════════════════════
-       STYLE-GUIDE TIP (nuevo/editar)
-    ══════════════════════════════════════ */
+    /* STYLE-GUIDE TIP (nuevo/editar)  */
     .amo-tip { display: flex; gap: 14px; align-items: flex-start; }
     .amo-tip-icon {
         width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;

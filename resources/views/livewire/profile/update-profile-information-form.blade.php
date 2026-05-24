@@ -62,54 +62,182 @@ new class extends Component
     }
 }; ?>
 
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
-        </h2>
+<section class="amo-card" style="max-width:820px;margin:auto;">
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
-        </p>
-    </header>
+    <div class="amo-card-header">
+        <span class="material-symbols-outlined" style="color:var(--primary);">
+            account_circle
+        </span>
 
-    <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+            <h3>Mi perfil</h3>
+
+            <p style="font-size:13px;color:var(--on-surface-variant);margin-top:2px;">
+                Actualiza tu información personal y correo electrónico.
+            </p>
         </div>
+    </div>
 
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" name="email" type="email" class="mt-1 block w-full" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+    <div class="amo-card-body">
 
-            @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
+        <form wire:submit="updateProfileInformation">
+
+            <div class="amo-grid-2">
+
+                {{-- Nombre --}}
                 <div>
-                    <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
+                    <label for="name" class="amo-label">
+                        Nombre completo
+                    </label>
 
-                        <button wire:click.prevent="sendVerification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
+                    <input
+                        wire:model="name"
+                        id="name"
+                        name="name"
+                        type="text"
+                        class="amo-input"
+                        required
+                        autofocus
+                        autocomplete="name">
 
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
-                    @endif
+                    @error('name')
+                        <p class="amo-error-msg">{{ $message }}</p>
+                    @enderror
                 </div>
+
+                {{-- Email --}}
+                <div>
+                    <label for="email" class="amo-label">
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        wire:model="email"
+                        id="email"
+                        name="email"
+                        type="email"
+                        class="amo-input"
+                        required
+                        autocomplete="username">
+
+                    @error('email')
+                        <p class="amo-error-msg">{{ $message }}</p>
+                    @enderror
+                </div>
+
+            </div>
+
+            {{-- Verificación --}}
+            @if (
+                auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail
+                && ! auth()->user()->hasVerifiedEmail()
+            )
+
+                <div style="
+                    margin-top:22px;
+                    padding:18px;
+                    border-radius:18px;
+                    background:rgba(254,203,198,0.25);
+                    border:1px solid rgba(225,191,180,0.6);
+                ">
+
+                    <div style="display:flex;gap:14px;align-items:flex-start;">
+
+                        <span class="material-symbols-outlined"
+                              style="color:var(--primary);font-size:28px;">
+                            mark_email_unread
+                        </span>
+
+                        <div>
+
+                            <p style="
+                                font-weight:600;
+                                margin-bottom:6px;
+                                color:var(--on-surface);
+                            ">
+                                Tu correo electrónico no ha sido verificado
+                            </p>
+
+                            <p style="
+                                font-size:14px;
+                                line-height:1.6;
+                                color:var(--on-surface-variant);
+                            ">
+                                Verifica tu correo para acceder a todas las funciones de tu cuenta.
+                            </p>
+
+                            <button
+                                wire:click.prevent="sendVerification"
+                                type="button"
+                                class="amo-btn-ghost"
+                                style="
+                                    margin-top:14px;
+                                    width:auto;
+                                    display:inline-flex;
+                                    align-items:center;
+                                    gap:8px;
+                                ">
+
+                                <span class="material-symbols-outlined">
+                                    outgoing_mail
+                                </span>
+
+                                Reenviar verificación
+                            </button>
+
+                            @if (session('status') === 'verification-link-sent')
+
+                                <p style="
+                                    margin-top:12px;
+                                    color:#15803d;
+                                    font-size:13px;
+                                    font-weight:600;
+                                ">
+                                    Se envió un nuevo enlace de verificación.
+                                </p>
+
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                </div>
+
             @endif
-        </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            {{-- Botón --}}
+            <div style="
+                display:flex;
+                align-items:center;
+                gap:14px;
+                margin-top:28px;
+            ">
 
-            <x-action-message class="me-3" on="profile-updated">
-                {{ __('Saved.') }}
-            </x-action-message>
-        </div>
-    </form>
+                <button type="submit" class="amo-btn-primary">
+
+                    <span class="material-symbols-outlined">
+                        save
+                    </span>
+
+                    Guardar cambios
+                </button>
+
+                <x-action-message on="profile-updated">
+
+                    <span style="
+                        color:#15803d;
+                        font-size:14px;
+                        font-weight:600;
+                    ">
+                        Perfil actualizado correctamente
+                    </span>
+
+                </x-action-message>
+
+            </div>
+
+        </form>
+
+    </div>
 </section>

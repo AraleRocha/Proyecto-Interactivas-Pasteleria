@@ -1,7 +1,4 @@
-{{-- resources/views/catalogo/show.blade.php --}}
 <x-app-layout :title="$producto->nombre">
-    <x-amo-styles />
-
     <style>
         .det-breadcrumb {
             display: flex;
@@ -144,13 +141,12 @@
     </style>
 
     <nav class="det-breadcrumb">
-        <a href="{{ route('catalogo.index') }}">Catálogo</a>
+        <a href="{{ route('client.catalogo.index') }}">Catálogo</a>
         <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
         <span class="current">{{ $producto->nombre }}</span>
     </nav>
 
     <div class="det-grid">
-        {{-- Galería --}}
         <div class="det-gallery">
             <div class="det-main-img">
                 @if($producto->imagen)
@@ -209,95 +205,49 @@
 
             <div class="det-trust">
                 <span><span class="material-symbols-outlined">verified</span> Ingredientes naturales</span>
-                <span><span class="material-symbols-outlined">local_shipping</span> Entrega en SLP</span>
                 <span><span class="material-symbols-outlined">handshake</span> Hecho a pedido</span>
             </div>
         </div>
     </div>
 
-    {{-- Sugerencias --}}
-    @if($sugerencias->count())
-        <div class="det-suggestions">
-            <h2>También te puede gustar</h2>
-            <div class="det-sug-grid">
-                @foreach($sugerencias as $sug)
-                    <a href="{{ route('catalogo.show', $sug->id) }}" class="amo-card" style="text-decoration:none;display:block;">
-                        <div style="aspect-ratio:4/3;overflow:hidden;">
-                            @if($sug->imagen)
-                                <img src="{{ asset('storage/' . $sug->imagen) }}" alt="{{ $sug->nombre }}" style="width:100%;height:100%;object-fit:cover;">
-                            @endif
-                        </div>
-                        <div class="amo-card-body">
-                            <h3 style="font-family:'Playfair Display',serif;font-weight:600;margin:0 0 4px;">{{ $sug->nombre }}</h3>
-                            <p style="font-size:13px;color:var(--on-surface-variant);">{{ $sug->sabor }}</p>
-                            <p style="font-weight:700;color:var(--primary);">${{ number_format($sug->precio,0) }}</p>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    @endif
-
     {{-- Modal pedido --}}
-<div
-    class="det-modal-overlay"
-    id="modal-overlay"
-    onclick="handleOverlayClick(event)"
->
-    <div class="det-modal">
-
-        <div class="det-modal-handle"></div>
-
-        <h2>Realizar pedido</h2>
-
-        <p class="det-modal-sub">
-            Completa los datos para confirmar tu pedido.
-        </p>
-
-        <div class="det-modal-summary">
-
-            <div>
-                <p class="det-modal-summary-name">
-                    {{ $producto->nombre }}
-                </p>
-
-                <p style="font-size:12px;">
-                    {{ $producto->tamano }}
-                    ·
-                    {{ $producto->sabor }}
+    <div class="det-modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+        <div class="det-modal">
+            <div class="det-modal-handle"></div>
+            <h2>Realizar pedido</h2>
+            <p class="det-modal-sub">
+                Completa los datos para confirmar tu pedido.
+            </p>
+            <div class="det-modal-summary">
+                <div>
+                    <p class="det-modal-summary-name">
+                        {{ $producto->nombre }}
+                    </p>
+                    <p style="font-size:12px;">
+                        {{ $producto->tamano }}
+                        ·
+                        {{ $producto->sabor }}
+                    </p>
+                </div>
+                <p class="det-modal-summary-price">
+                    ${{ number_format($producto->precio, 0) }}
                 </p>
             </div>
 
-            <p class="det-modal-summary-price">
-                ${{ number_format($producto->precio, 0) }}
-            </p>
-
+            <form action="{{ route('client.pedidos.agregar') }}" method="POST">
+                @csrf
+                <input type="hidden" name="producto_id" value="{{ $producto->id }}">
+                <label class="det-modal-label">Cantidad *</label>
+                <input
+                    type="number" name="cantidad" class="det-modal-input"
+                    min="1" max="{{ $producto->stock }}" value="1" required
+                >
+                <button type="submit" class="det-modal-submit">Agregar al pedido</button>
+            </form>
         </div>
-
-        <form action="{{ route('pedidos.agregar') }}" method="POST">
-            @csrf
-
-            <input type="hidden" name="producto_id" value="{{ $producto->id }}">
-
-            <label class="det-modal-label">Cantidad *</label>
-            <input
-                type="number"
-                name="cantidad"
-                class="det-modal-input"
-                min="1"
-                max="{{ $producto->stock }}"
-                value="1"
-                required
-            >
-
-            <button type="submit" class="det-modal-submit">Agregar al pedido</button>
-        </form>
-
     </div>
-</div>
 
     <style>
-        /* Modal styles (complemento) */
         .det-modal-overlay {
             position: fixed; inset: 0; z-index: 100;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
@@ -375,7 +325,6 @@
         }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
 
-        // Wishlist visual
         const wishBtn = document.getElementById('wish-btn');
         if (wishBtn) {
             wishBtn.addEventListener('click', () => {
@@ -387,4 +336,8 @@
             });
         }
     </script>
+
+    {{-- Chatbot --}}
+    @include('components.chatbot')
+
 </x-app-layout>

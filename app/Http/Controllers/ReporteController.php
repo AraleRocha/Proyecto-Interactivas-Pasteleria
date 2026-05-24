@@ -24,6 +24,7 @@ class ReporteController extends Controller
         return view('admin.reportes.catalogo', compact('productos', 'categoriaSeleccionada'));
     }
 
+    //Descargar PDF
     public function catalogoDescargar(Request $request)
     {
         $query = Producto::orderBy('categoria')->orderBy('nombre');
@@ -43,6 +44,7 @@ class ReporteController extends Controller
         return $pdf->download('catalogo-pasteles-' . $slug . '-' . now()->format('Ymd') . '.pdf');
     }
 
+    //Ver PDF
     public function catalogoStream(Request $request)
     {
         $query = Producto::orderBy('categoria')->orderBy('nombre');

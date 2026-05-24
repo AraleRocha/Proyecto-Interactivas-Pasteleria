@@ -27,16 +27,16 @@ class pedido extends Model
     ];
 
     public const ESTADOS = [
-        'borrador'       => 'Borrador',
-        'pendiente'      => 'Pendiente',
-        'por_confirmar'  => 'Por confirmar',
-        'horneando'      => 'Horneando',
-        'listo'          => 'Listo para entrega',
-        'rechazado'      => 'Rechazado',
-        'cancelado'      => 'Cancelado',
+        'borrador' => 'Borrador',
+        'pendiente' => 'Pendiente',
+        'por_confirmar' => 'Por confirmar',
+        'horneando' => 'Horneando',
+        'listo' => 'Listo para recoger',
+        'rechazado' => 'Rechazado',
+        'cancelado' => 'Cancelado',
     ];
     
-    /* ── Relaciones ── */
+    //Relaciones
  
     public function user()
     {
@@ -53,8 +53,7 @@ class pedido extends Model
         return $this->hasOne(Pago::class);
     }
  
-    /* ── Helpers ── */
- 
+    // helper
     public function recalcularTotal(): void
     {
         $this->total = $this->productos()->sum('subtotal');

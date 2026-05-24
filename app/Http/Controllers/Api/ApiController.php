@@ -13,30 +13,21 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-/**
- * ApiController — Amoretti
- *
- * 4 endpoints:
- *  POST /api/login                → obtener token
- *  GET  /api/productos            → catálogo público
- *  GET  /api/productos/{id}       → detalle de un pastel
- *  POST /api/pedidos              → agregar producto al borrador 🔒
+/* 4 endpoints:
+ POST /api/login: obtener token
+ GET  /api/productos: catálogo público
+ GET  /api/productos/{id}: detalle de un pastel
+ POST /api/pedidos: agregar producto al borrador del cliente (requiere token)
  */
 class ApiController extends Controller
 {
-    /* ══════════════════════════════════════════════════════════════
-     |  1. POST /api/login
-     |  Devuelve un token Sanctum.
-     |
-     |  Body JSON:
-     |    { "email": "...", "password": "...", "device_name": "..." }
-     * ════════════════════════════════════════════════════════════*/
+    /* Devuelve un token Sanctum. */
     public function login(Request $request): JsonResponse
     {
         try {
             $request->validate([
-                'email'       => 'required|email',
-                'password'    => 'required|string',
+                'email' => 'required|email',
+                'password' => 'required|string',
                 'device_name' => 'required|string',
             ]);
         } catch (ValidationException $e) {
@@ -73,14 +64,7 @@ class ApiController extends Controller
         ], 200);
     }
 
-    /* ══════════════════════════════════════════════════════════════
-     |  2. GET /api/productos
-     |  Devuelve todos los pasteles disponibles.
-     |  Acceso público — sin token.
-     |
-     |  Query params opcionales:
-     |    ?categoria=Boda
-     * ════════════════════════════════════════════════════════════*/
+    /* Devuelve todos los pasteles disponibles */
     public function catalogo(Request $request): JsonResponse
     {
         $query = Producto::where('disponible', true)
@@ -92,28 +76,24 @@ class ApiController extends Controller
         }
 
         $productos = $query->get()->map(fn($p) => [
-            'id'         => $p->id,
-            'nombre'     => $p->nombre,
-            'sabor'      => $p->sabor,
-            'tamano'     => $p->tamano,
+            'id' => $p->id,
+            'nombre' => $p->nombre,
+            'sabor' => $p->sabor,
+            'tamano' => $p->tamano,
             'categoria'  => $p->categoria,
-            'precio'     => (float) $p->precio,
-            'stock'      => $p->stock,
+            'precio' => (float) $p->precio,
+            'stock' => $p->stock,
             'imagen_url' => $p->imagen ? asset('storage/' . $p->imagen) : null,
         ]);
 
         return response()->json([
             'success' => true,
-            'total'   => $productos->count(),
-            'data'    => $productos,
+            'total' => $productos->count(),
+            'data' => $productos,
         ], 200);
     }
 
-    /* ══════════════════════════════════════════════════════════════
-     |  3. GET /api/productos/{id}
-     |  Detalle de un pastel.
-     |  Acceso público — sin token.
-     * ════════════════════════════════════════════════════════════*/
+    /* Detalle de un pastel */
     public function detalle(string $id): JsonResponse
     {
         $producto = Producto::where('disponible', true)->find($id);
@@ -128,41 +108,33 @@ class ApiController extends Controller
         return response()->json([
             'success' => true,
             'data'    => [
-                'id'         => $producto->id,
-                'nombre'     => $producto->nombre,
-                'sabor'      => $producto->sabor,
-                'tamano'     => $producto->tamano,
-                'categoria'  => $producto->categoria,
-                'precio'     => (float) $producto->precio,
-                'stock'      => $producto->stock,
+                'id' => $producto->id,
+                'nombre' => $producto->nombre,
+                'sabor' => $producto->sabor,
+                'tamano' => $producto->tamano,
+                'categoria' => $producto->categoria,
+                'precio' => (float) $producto->precio,
+                'stock' => $producto->stock,
                 'disponible' => (bool) $producto->disponible,
                 'imagen_url' => $producto->imagen ? asset('storage/' . $producto->imagen) : null,
-                'creado_en'  => $producto->created_at?->toIso8601String(),
+                'creado_en' => $producto->created_at?->toIso8601String(),
             ],
         ], 200);
     }
 
-    /* ══════════════════════════════════════════════════════════════
-     |  4. POST /api/pedidos
-     |  Agrega un producto al borrador activo del cliente.
-     |  Si no tiene borrador, lo crea automáticamente.
-     |  Requiere token 🔒
-     |
-     |  Body JSON:
-     |    { "producto_id": 3, "cantidad": 2 }
-     * ════════════════════════════════════════════════════════════*/
+    /* Agrega un producto al borrador activo del cliente, si no tiene borrador, lo crea automáticamente */
     public function agregarPedido(Request $request): JsonResponse
     {
         try {
             $data = $request->validate([
                 'producto_id' => 'required|exists:productos,id',
-                'cantidad'    => 'required|integer|min:1',
+                'cantidad' => 'required|integer|min:1',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Datos inválidos.',
-                'errors'  => $e->errors(),
+                'errors' => $e->errors(),
             ], 422);
         }
 
@@ -203,11 +175,11 @@ class ApiController extends Controller
                     $item->save();
                 } else {
                     pedido_producto::create([
-                        'pedido_id'       => $pedido->id,
-                        'producto_id'     => $producto->id,
-                        'cantidad'        => $data['cantidad'],
+                        'pedido_id' => $pedido->id,
+                        'producto_id' => $producto->id,
+                        'cantidad' => $data['cantidad'],
                         'precio_unitario' => $producto->precio,
-                        'subtotal'        => $producto->precio * $data['cantidad'],
+                        'subtotal' => $producto->precio * $data['cantidad'],
                     ]);
                 }
 
@@ -220,22 +192,22 @@ class ApiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Datos inválidos.',
-                'errors'  => $e->errors(),
+                'errors' => $e->errors(),
             ], 422);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'Producto agregado al pedido.',
-            'data'    => [
+            'data' => [
                 'pedido_id' => $pedido->id,
-                'estado'    => $pedido->estado,
-                'total'     => (float) $pedido->total,
+                'estado' => $pedido->estado,
+                'total' => (float) $pedido->total,
                 'productos' => $pedido->productos->map(fn($i) => [
-                    'nombre'          => $i->producto?->nombre,
-                    'cantidad'        => $i->cantidad,
+                    'nombre' => $i->producto?->nombre,
+                    'cantidad' => $i->cantidad,
                     'precio_unitario' => (float) $i->precio_unitario,
-                    'subtotal'        => (float) $i->subtotal,
+                    'subtotal' => (float) $i->subtotal,
                 ])->values(),
             ],
         ], 201);

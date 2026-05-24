@@ -1,6 +1,4 @@
 <x-app-layout :title="'Pedido #' . str_pad($pedido->id, 5, '0', STR_PAD_LEFT)">
-<x-amo-styles />
-
 <style>
 body { background: var(--surface); }
 
@@ -269,13 +267,11 @@ body { background: var(--surface); }
 </style>
 
 <div class="det-wrap">
-
-    <a href="{{ route('pedidos.index') }}" class="det-back">
+    <a href="{{ route('admin.pedidos.index') }}" class="det-back">
         <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
-        Volver a mis pedidos
+        Volver a la lista de pedidos
     </a>
 
-    {{-- Flash --}}
     @if(session('success'))
         <div class="flash ok">
             <span class="material-symbols-outlined" style="font-size:17px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">check_circle</span>
@@ -289,7 +285,6 @@ body { background: var(--surface); }
         </div>
     @endif
 
-    {{-- Header --}}
     <div class="det-header">
         <div>
             <h1 class="det-title">Pedido #{{ str_pad($pedido->id, 5, '0', STR_PAD_LEFT) }}</h1>
@@ -318,15 +313,15 @@ body { background: var(--surface); }
         </span>
     </div>
 
-    {{-- Timeline (solo cliente, estados no cancelado) --}}
+    {{-- estados (solo cliente, estados no cancelado) --}}
     @if(auth()->user()->role !== 'admin' && $pedido->estado !== 'cancelado')
         @php
             $pasos = [
-                ['estado' => 'borrador',   'icon' => 'edit_note',           'label' => 'Borrador'],
-                ['estado' => 'pendiente',  'icon' => 'schedule',            'label' => 'Pendiente'],
+                ['estado' => 'borrador', 'icon' => 'edit_note', 'label' => 'Borrador'],
+                ['estado' => 'pendiente', 'icon' => 'schedule', 'label' => 'Pendiente'],
                 ['estado' => 'por_confirmar', 'icon' => 'precision_manufacturing', 'label' => 'Por confirmar'],
-                ['estado' => 'horneando',      'icon' => 'inventory',           'label' => 'Horneando'],
-                ['estado' => 'listo',  'icon' => 'check_circle',        'label' => 'Listo'],
+                ['estado' => 'horneando', 'icon' => 'inventory', 'label' => 'Horneando'],
+                ['estado' => 'listo',  'icon' => 'check_circle', 'label' => 'Listo'],
             ];
             $orden = array_column($pasos, 'estado');
             $currentIdx = array_search($pedido->estado, $orden) ?? 0;
@@ -353,8 +348,7 @@ body { background: var(--surface); }
     @endif
 
     <div class="det-grid">
-
-        {{-- ── IZQUIERDA: productos ── --}}
+        {{--  productos  --}}
         <div>
             <div class="det-card">
                 <div class="det-card-head">
@@ -362,7 +356,7 @@ body { background: var(--surface); }
                     <h3>Productos del pedido</h3>
                     {{-- Solo borrador puede agregar más --}}
                     @if($pedido->estado === 'borrador' && auth()->user()->role !== 'admin')
-                        <a href="{{ route('catalogo.index') }}"
+                        <a href="{{ route('client.catalogo.index') }}"
                            style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;
                                   font-size:12px;font-weight:700;color:var(--primary);text-decoration:none;
                                   padding:6px 12px;border-radius:8px;border:1px solid var(--outline-variant);
@@ -406,8 +400,8 @@ body { background: var(--surface); }
                                             onclick="abrirModal(this)"
                                             data-nombre="{{ $item->producto?->nombre }}"
                                             data-cantidad="{{ $item->cantidad }}"
-                                            data-update="{{ route('pedido-items.update', $item) }}"
-                                            data-delete="{{ route('pedido-items.destroy', $item) }}">
+                                            data-update="{{ route('client.pedido-items.update', $item) }}"
+                                            data-delete="{{ route('client.pedido-items.destroy', $item) }}">
                                         <span class="material-symbols-outlined" style="font-size:14px;">edit</span>
                                         Editar
                                     </button>
@@ -419,7 +413,7 @@ body { background: var(--surface); }
                             <span class="material-symbols-outlined" style="font-size:36px;opacity:0.25;display:block;margin-bottom:8px;">shopping_bag</span>
                             <p style="font-size:14px;">No hay productos en este pedido.</p>
                             @if($pedido->estado === 'borrador')
-                                <a href="{{ route('catalogo.index') }}" class="btn-primary"
+                                <a href="{{ route('client.catalogo.index') }}" class="btn-primary"
                                    style="margin-top:14px;width:auto;display:inline-flex;padding:10px 20px;">
                                     Ir al catálogo
                                 </a>
@@ -430,7 +424,7 @@ body { background: var(--surface); }
             </div>
         </div>
 
-        {{-- ── DERECHA: resumen + acción ── --}}
+        {{-- derecha: resumen + acción --}}
         <div>
 
             {{-- Resumen --}}
@@ -467,7 +461,7 @@ body { background: var(--surface); }
                 </div>
             </div>
 
-            {{-- ══ BORRADOR: Confirmar pedido ══ --}}
+            {{-- Borrador: Confirmar pedido --}}
             @if($pedido->estado === 'borrador' && auth()->user()->role !== 'admin')
                 <div class="det-card">
                     <div class="det-card-head">
@@ -481,7 +475,7 @@ body { background: var(--surface); }
                             <p>Una vez confirmado, la fecha de entrega se asignará automáticamente. El pedido pasará a <strong>Pendiente</strong> donde podrás completar la compra.</p>
                         </div>
 
-                        <form method="POST" action="{{ route('pedidos.confirmar', $pedido) }}">
+                        <form method="POST" action="{{ route('client.pedidos.confirmar', $pedido) }}">
                             @csrf
 
                             <label class="fin-label">Método de pago *</label>
@@ -515,7 +509,7 @@ body { background: var(--surface); }
                 </div>
             @endif
 
-            {{-- ══ PENDIENTE: Comprar / Cancelar ══ --}}
+            {{-- Pendiente: Comprar / Cancelar --}}
             @if($pedido->estado === 'pendiente' && auth()->user()->role !== 'admin')
                 <div class="det-card">
                     <div class="det-card-head">
@@ -529,19 +523,42 @@ body { background: var(--surface); }
                             <p>Al comprar, el stock se descontará y la fecha de entrega se confirmará a <strong>7 días</strong> desde hoy. Este paso es irreversible.</p>
                         </div>
 
-                        <form method="POST" action="{{ route('pedidos.comprar', $pedido) }}">
+                        <form method="POST" style="margin:0;">
                             @csrf
-                            <button type="submit" class="btn-primary">
-                                <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">shopping_cart_checkout</span>
+
+                            <button type="button"
+                                class="btn-primary"
+                                onclick="prepararEliminacion(
+                                    '{{ route('client.pedidos.comprar', $pedido) }}',
+                                    '¿Deseas completar la compra de este pedido?',
+                                    'POST'
+                                )">
+
+                                <span class="material-symbols-outlined"
+                                    style="font-size:18px;margin-right:4px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">
+                                    shopping_cart_checkout
+                                </span>
+
                                 Comprar ahora
                             </button>
                         </form>
 
-                        <form method="POST" action="{{ route('pedidos.cancelar', $pedido) }}"
-                              onsubmit="return confirm('¿Seguro que deseas cancelar? Esta acción no se puede deshacer.')">
+                        <form method="POST" style="margin:0;">
                             @csrf
-                            <button type="submit" class="btn-danger">
-                                <span class="material-symbols-outlined" style="font-size:17px;">cancel</span>
+
+                            <button type="button"
+                                class="btn-danger"
+                                onclick="prepararEliminacion(
+                                    '{{ route('client.pedidos.cancelar', $pedido) }}',
+                                    '¿Seguro que deseas cancelar este pedido?',
+                                    'POST'
+                                )">
+
+                                <span class="material-symbols-outlined"
+                                    style="font-size:17px;margin-right:4px;">
+                                    cancel
+                                </span>
+
                                 Cancelar pedido
                             </button>
                         </form>
@@ -552,7 +569,7 @@ body { background: var(--surface); }
     </div>
 </div>
 
-{{-- ── MODAL editar ítem (solo borrador) ── --}}
+{{-- editar ítem (solo borrador) ── --}}
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)cerrarModal()">
     <div class="modal-box">
         <button class="modal-close" onclick="cerrarModal()">×</button>
@@ -572,11 +589,23 @@ body { background: var(--surface); }
         </form>
 
         <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--outline-variant);">
-            <form id="form-delete" method="POST"
-                  onsubmit="return confirm('¿Eliminar «' + document.getElementById('modal-nombre').textContent + '» del pedido?')">
-                @csrf @method('DELETE')
-                <button type="submit" class="btn-danger">
-                    <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+            <form id="form-delete" method="POST" style="margin:0;">
+                @csrf
+                @method('DELETE')
+
+                <button type="button"
+                    class="btn-danger"
+                    onclick="prepararEliminacion(
+                        document.getElementById('form-delete').action,
+                        '¿Eliminar este producto del pedido?',
+                        'DELETE'
+                    )">
+
+                    <span class="material-symbols-outlined"
+                        style="font-size:16px;margin-right:4px;">
+                        delete
+                    </span>
+
                     Eliminar del pedido
                 </button>
             </form>

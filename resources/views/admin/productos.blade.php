@@ -1,10 +1,6 @@
 <x-app-layout :title="__('Pasteles')">
-    <x-amo-styles />
-
-    {{-- ══════ MAIN ══════ --}}
     <main class="amo-main">
 
-        {{-- Page title --}}
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:32px;">
             <div>
                 <h2 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:600;color:var(--on-surface);line-height:1.2;">
@@ -14,53 +10,19 @@
                     Gestione la disponibilidad y stock de sus creaciones artesanales.
                 </p>
             </div>
-            <a href="{{ route('productos.create') }}" class="amo-btn-primary">
+            <a href="{{ route('admin.productos.create') }}" class="amo-btn-primary">
                 <span class="material-symbols-outlined" style="font-size:20px;">add</span>
                 Nuevo Pastel
             </a>
         </div>
 
-        {{-- Flash --}}
+        {{-- avisos --}}
         @if(session('success'))
             <div class="amo-flash-ok">{{ session('success') }}</div>
         @endif
 
-        {{-- Metric Cards --}}
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;margin-bottom:32px;">
-            <div class="amo-metric-card">
-                <span class="amo-metric-label">Total SKU</span>
-                <span class="amo-metric-value primary">{{ $productos->count() }}</span>
-                <span class="amo-metric-sub" style="color:#16a34a;">
-                    <span class="material-symbols-outlined" style="font-size:14px;">trending_up</span> Catálogo activo
-                </span>
-            </div>
-            <div class="amo-metric-card">
-                <span class="amo-metric-label">Poco Stock</span>
-                <span class="amo-metric-value">{{ $productos->filter(fn($p) => $p->stock > 0 && $p->stock <= 5)->count() }}</span>
-                <span class="amo-metric-sub" style="color:var(--primary);">
-                    <span class="material-symbols-outlined" style="font-size:14px;">warning</span> Acción requerida
-                </span>
-            </div>
-            <div class="amo-metric-card">
-                <span class="amo-metric-label">Disponibles</span>
-                <span class="amo-metric-value">{{ $productos->where('disponible', true)->count() }}</span>
-                <span class="amo-metric-sub" style="color:#16a34a;">
-                    <span class="material-symbols-outlined" style="font-size:14px;">cake</span> En tienda
-                </span>
-            </div>
-            <div class="amo-metric-card" style="border:1px solid rgba(151,49,0,0.15);">
-                <span class="amo-metric-label" style="color:var(--primary);">Valor Stock</span>
-                <span class="amo-metric-value">
-                    ${{ number_format($productos->sum(fn($p) => $p->precio * $p->stock), 0) }}
-                </span>
-                <span class="amo-metric-sub" style="color:var(--on-surface-variant);opacity:.6;">Inventario activo</span>
-            </div>
-        </div>
-
-        {{-- Table Card --}}
+        {{-- Tabla --}}
         <div class="amo-table-card">
-
-            {{-- Toolbar --}}
             <div class="amo-table-toolbar">
                 <div></div>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -76,7 +38,7 @@
 
                         <button
                             type="submit"
-                            formaction="{{ route('reportes.pasteles.stream') }}"
+                            formaction="{{ route('admin.reportes.pasteles.stream') }}"
                             formtarget="_blank"
                             class="amo-icon-btn"
                             title="Ver reporte"
@@ -86,7 +48,7 @@
 
                         <button
                             type="submit"
-                            formaction="{{ route('reportes.pasteles.descargar') }}"
+                            formaction="{{ route('admin.reportes.pasteles.descargar') }}"
                             class="amo-icon-btn"
                             title="Descargar PDF"
                         >
@@ -96,7 +58,6 @@
                 </div>
             </div>
 
-            {{-- Table --}}
             <div style="overflow-x:auto;">
                 <table id="tabla-productos">
                     <thead>
@@ -184,15 +145,26 @@
                                 {{-- Acciones --}}
                                 <td style="text-align:right;">
                                     <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center;">
-                                        <a href="{{ route('productos.edit', $producto->id) }}" class="amo-btn-edit">
+                                        <a href="{{ route('admin.productos.edit', $producto->id) }}" class="amo-btn-edit">
                                             <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">edit</span>Editar
                                         </a>
-                                        <form action="{{ route('productos.destroy', $producto->id) }}" method="POST"
-                                              onsubmit="return confirm('¿Eliminar este producto?')" style="margin:0;">
+                                        <form method="POST" style="margin:0;">
                                             @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="amo-btn-del">
-                                                <span class="material-symbols-outlined" style="font-size:15px;margin-right:4px;">delete</span>Eliminar
+
+                                            <button type="button"
+                                                class="amo-btn-del"
+                                                onclick="prepararEliminacion(
+                                                    '{{ route('admin.productos.destroy', $producto->id) }}',
+                                                    '¿Eliminar el producto {{ $producto->nombre }}?',
+                                                    'DELETE'
+                                                )">
+
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:15px;margin-right:4px;">
+                                                    delete
+                                                </span>
+
+                                                Eliminar
                                             </button>
                                         </form>
                                     </div>
@@ -203,7 +175,7 @@
                                 <td colspan="9" style="text-align:center;padding:48px 24px;">
                                     <span class="material-symbols-outlined" style="font-size:48px;color:var(--outline-variant);display:block;margin-bottom:12px;">inventory_2</span>
                                     <p style="color:var(--on-surface-variant);font-size:15px;">No hay productos registrados.</p>
-                                    <a href="{{ route('productos.create') }}" class="amo-btn-primary" style="margin-top:16px;display:inline-flex;">
+                                    <a href="{{ route('admin.productos.create') }}" class="amo-btn-primary" style="margin-top:16px;display:inline-flex;">
                                         <span class="material-symbols-outlined" style="font-size:18px;">add</span> Crear el primero
                                     </a>
                                 </td>
@@ -213,7 +185,7 @@
                 </table>
             </div>
 
-            {{-- Pagination --}}
+            {{-- paginacion --}}
             @if(method_exists($productos, 'links'))
             <div class="amo-pagination">
                 <span style="font-size:13px;color:var(--on-surface-variant);">
@@ -248,3 +220,4 @@
         }
     </script>
 </x-app-layout>
+

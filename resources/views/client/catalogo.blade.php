@@ -1,7 +1,4 @@
-{{-- resources/views/catalogo/index.blade.php --}}
 <x-app-layout :title="__('Catálogo')">
-    <x-amo-styles />
-
     <style>
         .cat-grid {
             display: grid;
@@ -401,7 +398,6 @@
         }
     </style>
 
-    {{-- Hero --}}
     <section class="cat-hero">
         <p class="cat-hero-eyebrow" style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.7;">Colección Artesanal</p>
         <h1>Pasteles para cada <em>celebración</em></h1>
@@ -419,7 +415,6 @@
         <div class="cat-sort">
             <span id="cat-count">{{ $productos->count() }} pasteles</span>
             <select id="sort-select">
-                <option value="default">Destacados</option>
                 <option value="price-asc">Precio: menor</option>
                 <option value="price-desc">Precio: mayor</option>
                 <option value="name">Nombre A–Z</option>
@@ -427,7 +422,7 @@
         </div>
     </div>
 
-    {{-- Grid productos --}}
+    {{-- productos --}}
     <div class="cat-grid" id="product-grid">
  
         @forelse($productos as $producto)
@@ -446,8 +441,8 @@
                  data-nombre="{{ strtolower($producto->nombre) }}"
                  data-stock="{{ $producto->stock }}">
  
-                {{-- Imagen clickeable --}}
-                <a href="{{ route('catalogo.show', $producto->id) }}" class="cat-card-img" style="display:block;text-decoration:none;">
+                {{-- Imagen --}}
+                <a href="{{ route('client.catalogo.show', $producto->id) }}" class="cat-card-img" style="display:block;text-decoration:none;">
                     @if($producto->imagen)
                         <img src="{{ asset('storage/' . $producto->imagen) }}"
                              alt="{{ $producto->nombre }}"
@@ -470,7 +465,7 @@
                 {{-- Body --}}
                 <div class="cat-card-body">
                     <div class="cat-card-top">
-                        <a href="{{ route('catalogo.show', $producto->id) }}"
+                        <a href="{{ route('client.catalogo.show', $producto->id) }}"
                            style="text-decoration:none;flex:1;">
                             <h2 class="cat-card-name">{{ $producto->nombre }}</h2>
                         </a>
@@ -479,7 +474,7 @@
                     <p class="cat-card-sabor">{{ $producto->sabor }}</p>
  
                     <div class="cat-card-footer">
-                        <a href="{{ route('catalogo.show', $producto->id) }}" class="cat-btn-order"
+                        <a href="{{ route('client.catalogo.show', $producto->id) }}" class="cat-btn-order"
                            style="text-decoration:none;">
                             <span class="material-symbols-outlined" style="font-size:17px;">visibility</span>
                             Ver pastel
@@ -495,23 +490,40 @@
         @endforelse
     </div>
 
-    {{-- Bento inferior --}}
+    {{-- Información de relleno --}}
     <div class="cat-bento">
         <div class="cat-bento-item large">
-            <span class="material-symbols-outlined">design_services</span>
-            <h3 style="font-family:'Playfair Display',serif;font-size:28px;">Pedido a tu medida</h3>
-            <p style="margin-top:8px;">Diseña el pastel de tus sueños con nuestros maestros pasteleros. Personalizamos sabores, tamaños y decoración.</p>
-            <a href="#" class="amo-btn-primary" style="margin-top:24px;display:inline-flex;">Solicitar cotización</a>
+            <span class="material-symbols-outlined">bakery_dining</span>
+            <h3 style="font-family:'Playfair Display',serif;font-size:28px;">
+                Pastelería artesanal
+            </h3>
+            <p style="margin-top:8px;line-height:1.7;">
+                Cada pastel es elaborado de forma artesanal con ingredientes frescos
+                y recetas cuidadosamente preparadas para ofrecer sabor, calidad
+                y una presentación especial.
+            </p>
         </div>
+
         <div class="cat-bento-item">
-            <span class="material-symbols-outlined">workspace_premium</span>
-            <h3 style="font-family:'Playfair Display',serif;font-size:22px;">Elaboración artesanal</h3>
-            <p>Sin conservadores artificiales, horneado el mismo día.</p>
+            <span class="material-symbols-outlined">cake</span>
+            <h3 style="font-family:'Playfair Display',serif;font-size:22px;">
+                Catálogo disponible
+            </h3>
+            <p>
+                Explora nuestros diseños disponibles para cumpleaños,
+                bodas, aniversarios y celebraciones especiales.
+            </p>
         </div>
+
         <div class="cat-bento-item">
-            <span class="material-symbols-outlined">local_shipping</span>
-            <h3 style="font-family:'Playfair Display',serif;font-size:22px;">Entrega en San Luis Potosí</h3>
-            <p>Empaque isotérmico para que llegue perfecto.</p>
+            <span class="material-symbols-outlined">storefront</span>
+            <h3 style="font-family:'Playfair Display',serif;font-size:22px;">
+                Recoge en sucursal
+            </h3>
+            <p>
+                Actualmente los pedidos se entregan únicamente
+                para recogida en tienda.
+            </p>
         </div>
     </div>
 
@@ -522,7 +534,7 @@
         let activeCat = '';
 
         function filterAndSort() {
-            const cards = [...grid.querySelectorAll('.cat-product-card')];
+            const cards = [...grid.querySelectorAll('.cat-card')];
             const sortVal = sortSelect.value;
 
             // Filtrar
@@ -553,4 +565,8 @@
         });
         sortSelect.addEventListener('change', filterAndSort);
     </script>
+
+    {{-- Chatbot --}}
+    @include('components.chatbot')
+
 </x-app-layout>

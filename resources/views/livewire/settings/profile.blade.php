@@ -33,15 +33,10 @@
                 <div class="flex items-center justify-end">
                     <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>
                 </div>
-
                 <x-action-message class="me-3" on="profile-updated">
                     {{ __('Saved.') }}
                 </x-action-message>
             </div>
         </form>
-
-        @if ($this->showDeleteUser)
-            <livewire:settings.delete-user-form />
-        @endif
     </x-settings.layout>
 </section>

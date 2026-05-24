@@ -8,40 +8,34 @@ use App\Models\Producto;
 
 class ProductosController extends Controller
 {
-    /**
-     * Listado de productos.
-     */
+    //Listado de productos
     public function index()
     {
         $productos = Producto::all();
         return view('admin.productos', compact('productos'));
     }
 
-    /**
-     * Formulario de creación.
-     */
+    //Formulario de creación
     public function create()
     {
         return view('admin.producto_nuevo');
     }
 
-    /**
-     * Guardar nuevo producto.
-     */
+    //Guardar nuevo producto
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre'     => 'required|string|max:255',
-            'sabor'      => 'required|string|max:255',
-            'tamano'     => 'required|string|max:255',
-            'categoria'  => 'required|string|max:255',
-            'precio'     => 'required|numeric|min:0',
-            'stock'      => 'nullable|integer|min:0',
+            'nombre' => 'required|string|max:255',
+            'sabor' => 'required|string|max:255',
+            'tamano' => 'required|string|max:255',
+            'categoria' => 'required|string|max:255',
+            'precio' => 'required|numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
             'disponible' => 'nullable|boolean',
-            'imagen'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $validated['stock']      = $validated['stock'] ?? 0;
+        $validated['stock'] = $validated['stock'] ?? 0;
         $validated['disponible'] = $request->boolean('disponible');
 
         if ($request->hasFile('imagen')) {
@@ -50,64 +44,52 @@ class ProductosController extends Controller
 
         Producto::create($validated);
 
-        return redirect()->route('productos.index')
+        return redirect()->route('admin.productos.index')
             ->with('success', 'Producto creado correctamente.');
     }
 
-    /**
-     * Formulario de edición.
-     */
+    // Formulario de edición
     public function edit(string $id)
     {
         $producto = Producto::findOrFail($id);
         return view('admin.producto_modifica', compact('producto'));
     }
 
-    /**
-     * Actualizar producto existente.
-     *
-     * Problemas que se corrigen:
-     * - stock nullable: se asigna 0 si viene vacío en lugar de dejar null.
-     * - disponible: viene como checkbox (puede no venir si está desmarcado); el
-     *   hidden input del formulario garantiza que siempre llegue un valor, pero
-     *   usamos boolean() para seguridad.
-     * - eliminar_imagen: permite borrar la imagen actual sin subir una nueva.
-     * - Sin imagen nueva y sin solicitud de eliminar → se conserva la imagen.
-     */
+    //Actualizar producto existente
     public function update(Request $request, string $id)
     {
         $producto = Producto::findOrFail($id);
 
         $validated = $request->validate([
-            'nombre'          => 'required|string|max:255',
-            'sabor'           => 'required|string|max:255',
-            'tamano'          => 'required|string|max:255',
-            'categoria'       => 'required|string|max:255',
-            'precio'          => 'required|numeric|min:0',
-            'stock'           => 'nullable|integer|min:0',
-            'disponible'      => 'nullable|boolean',
-            'imagen'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'nombre' => 'required|string|max:255',
+            'sabor' => 'required|string|max:255',
+            'tamano' => 'required|string|max:255',
+            'categoria' => 'required|string|max:255',
+            'precio' => 'required|numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
+            'disponible' => 'nullable|boolean',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'eliminar_imagen' => 'nullable|boolean',
         ]);
 
-        $validated['stock']      = $validated['stock'] ?? 0;
+        $validated['stock'] = $validated['stock'] ?? 0;
         $validated['disponible'] = $request->boolean('disponible');
 
-        // — Caso 1: se sube nueva imagen → reemplazar
+        // Si se sube nueva imagen la reemplaza
         if ($request->hasFile('imagen')) {
             if ($producto->imagen) {
                 Storage::disk('public')->delete($producto->imagen);
             }
             $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
 
-        // — Caso 2: se marca eliminar imagen sin subir nueva → borrar y dejar null
+        // Si se marca eliminar imagen sin subir nueva: borrar y dejar null
         } elseif ($request->boolean('eliminar_imagen')) {
             if ($producto->imagen) {
                 Storage::disk('public')->delete($producto->imagen);
             }
             $validated['imagen'] = null;
 
-        // — Caso 3: ninguna acción sobre imagen → conservar la actual
+        // Ninguna acción sobre imagen: conservar la actual
         } else {
             unset($validated['imagen']);
         }
@@ -117,13 +99,11 @@ class ProductosController extends Controller
 
         $producto->update($validated);
 
-        return redirect()->route('productos.index')
+        return redirect()->route('admin.productos.index')
             ->with('success', 'Producto actualizado correctamente.');
     }
 
-    /**
-     * Eliminar producto.
-     */
+    //Eliminar producto
     public function destroy(string $id)
     {
         $producto = Producto::findOrFail($id);
@@ -134,7 +114,7 @@ class ProductosController extends Controller
 
         $producto->delete();
 
-        return redirect()->route('productos.index')
+        return redirect()->route('admin.productos.index')
             ->with('success', 'Producto eliminado correctamente.');
     }
 }

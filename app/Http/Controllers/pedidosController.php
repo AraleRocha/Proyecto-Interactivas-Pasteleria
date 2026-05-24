@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PedidoEstado;
 use App\Models\Pedido;
 use App\Models\pedido_producto;
 use App\Models\Pago;
@@ -9,11 +10,11 @@ use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class PedidosController extends Controller
 {
-    /* ── LISTADO ──────────────────────────────────────────────────*/
     public function index()
     {
         $user  = Auth::user();
@@ -41,12 +42,10 @@ class PedidosController extends Controller
         return view('client.pedidos', compact('pedidos', 'pedidoBorrador'));
     }
 
-    /* ── DETALLE ──────────────────────────────────────────────────*/
+    // Detalle
     public function show(Pedido $pedido)
     {
         $user = Auth::user();
-        if ($user->role !== 'admin' && $pedido->user_id !== $user->id) abort(403);
-
         $pedido->load(['productos.producto', 'pago', 'user']);
 
         if ($user->role === 'admin') {
@@ -56,12 +55,12 @@ class PedidosController extends Controller
         return view('client.pedido_detalle', compact('pedido'));
     }
 
-    /* ── AGREGAR AL BORRADOR ──────────────────────────────────────*/
+    // Agregar al pedido (si no tiene uno en borrador, se crea automáticamente)
     public function agregar(Request $request)
     {
         $data = $request->validate([
             'producto_id' => ['required', 'exists:productos,id'],
-            'cantidad'    => ['required', 'integer', 'min:1'],
+            'cantidad'=> ['required', 'integer', 'min:1'],
         ]);
 
         $user   = Auth::user();
@@ -91,11 +90,11 @@ class PedidosController extends Controller
                 $item->save();
             } else {
                 pedido_producto::create([
-                    'pedido_id'       => $pedido->id,
-                    'producto_id'     => $producto->id,
-                    'cantidad'        => $data['cantidad'],
+                    'pedido_id' => $pedido->id,
+                    'producto_id' => $producto->id,
+                    'cantidad' => $data['cantidad'],
                     'precio_unitario' => $producto->precio,
-                    'subtotal'        => $producto->precio * $data['cantidad'],
+                    'subtotal' => $producto->precio * $data['cantidad'],
                 ]);
             }
 
@@ -104,11 +103,11 @@ class PedidosController extends Controller
             return $pedido;
         });
 
-        return redirect()->route('pedidos.show', $pedido)
+        return redirect()->route('client.pedidos.show', $pedido)
                          ->with('success', 'Producto agregado al pedido.');
     }
 
-    /* ── EDITAR ÍTEM (solo borrador) ──────────────────────────────*/
+    // Editar ítem (solo borrador)
     public function updateItem(Request $request, pedido_producto $item)
     {
         $this->autorizarItem($item);
@@ -128,7 +127,7 @@ class PedidosController extends Controller
         return back()->with('success', 'Cantidad actualizada.');
     }
 
-    /* ── ELIMINAR ÍTEM (solo borrador) ────────────────────────────*/
+    // Eliminar ítem (solo borrador)
     public function destroyItem(pedido_producto $item)
     {
         $this->autorizarItem($item);
@@ -143,15 +142,10 @@ class PedidosController extends Controller
         return back()->with('success', 'Producto eliminado del pedido.');
     }
 
-    /* ── CONFIRMAR PEDIDO: borrador → pendiente ───────────────────
-     |  Solo pide método de pago.
-     |  La fecha de entrega se fija automática a +2 días.
-     * ─────────────────────────────────────────────────────────────*/
+    // Confirmar pedido: borrador - pendiente
     public function confirmar(Request $request, Pedido $pedido)
     {
         $this->autorizarPedido($pedido);
-
-        if ($pedido->estado !== 'borrador') abort(403);
 
         if ($pedido->productos()->count() === 0) {
             return back()->withErrors(['pedido' => 'El pedido está vacío.']);
@@ -163,8 +157,7 @@ class PedidosController extends Controller
 
         DB::transaction(function () use ($pedido, $data) {
             $pedido->update([
-                'estado'        => 'pendiente',
-                'fecha_entrega' => now()->addDays(2),   // automático
+                'estado' => 'pendiente',
             ]);
 
             Pago::updateOrCreate(
@@ -172,23 +165,19 @@ class PedidosController extends Controller
                 [
                     'metodo_pago' => $data['metodo_pago'],
                     'estado_pago' => 'pendiente',
-                    'monto'       => $pedido->total,
+                    'monto' => $pedido->total,
                 ]
             );
         });
 
-        return redirect()->route('pedidos.show', $pedido)
+        return redirect()->route('client.pedidos.show', $pedido)
                          ->with('success', 'Pedido confirmado. Ya puedes proceder a la compra.');
     }
 
-    /* ── COMPRAR: pendiente → por_confirmar ──────────────────────────
-     |  Descuenta stock y fija entrega +7 días desde hoy.
-     * ─────────────────────────────────────────────────────────────*/
+    // Comprar: pendiente - por_confirmar, se descuenta stock y fija entrega +7 días.
     public function comprar(Pedido $pedido)
     {
         $this->autorizarPedido($pedido);
-
-        if ($pedido->estado !== 'pendiente') abort(403);
 
         DB::transaction(function () use ($pedido) {
             $pedido->load('productos.producto');
@@ -209,32 +198,33 @@ class PedidosController extends Controller
             $pedido->pago?->update(['estado_pago' => 'pagado']);
 
             $pedido->update([
-                'estado'        => 'por_confirmar',
-                'fecha_entrega' => now()->addWeek(),    // automático +7 días
+                'estado' => 'por_confirmar',
+                'fecha_entrega' => now()->addWeek(), 
             ]);
         });
 
-        return redirect()->route('pedidos.show', $pedido)
-                         ->with('success', '¡Compra realizada! Tu pedido estará listo en aprox. 7 días.');
+        $this->enviarCorreoEstado($pedido);
+
+        return redirect()->route('client.pedidos.show', $pedido)->with('success', '¡Compra realizada! Tu pedido estará listo en aprox. 7 días.');
     }
 
-    /* ── CANCELAR (solo pendiente) ────────────────────────────────*/
+    // Cancelar (solo pendiente) 
     public function cancelar(Pedido $pedido)
     {
         $this->autorizarPedido($pedido);
-
-        if ($pedido->estado !== 'pendiente') abort(403);
 
         DB::transaction(function () use ($pedido) {
             $pedido->update(['estado' => 'cancelado']);
             $pedido->pago?->delete();
         });
 
-        return redirect()->route('pedidos.index')
+        $this->enviarCorreoEstado($pedido);
+
+        return redirect()->route('client.pedidos.index')
                          ->with('success', 'Pedido cancelado.');
     }
 
-    /* ── ADMIN: cambiar estado ────────────────────────────────────*/
+    // ADMIN: cambiar estado
     public function updateEstado(Request $request, Pedido $pedido)
     {
         if (Auth::user()->role !== 'admin') abort(403);
@@ -248,7 +238,7 @@ class PedidosController extends Controller
         return back()->with('success', 'Estado actualizado.');
     }
 
-    //Para Admin
+    //Para Adminm aprobar pedido: por_confirmar → horneando (descuenta stock, marca pago como pagado)
     public function aprobar(Pedido $pedido)
     {
         if (Auth::user()->role !== 'admin') abort(403);
@@ -278,6 +268,8 @@ class PedidosController extends Controller
             ]);
         });
 
+        $this->enviarCorreoEstado($pedido);
+
         return back()->with('success', 'Pedido aprobado. Ahora está horneando.');
     }
 
@@ -295,10 +287,11 @@ class PedidosController extends Controller
                 'estado_pago' => 'rechazado',
             ]);
         });
-
+        $this->enviarCorreoEstado($pedido);
         return back()->with('success', 'Pedido rechazado.');
     }
 
+    // Para Adminm marcar como listo: horneando - listo
     public function marcarListo(Pedido $pedido)
     {
         if (Auth::user()->role !== 'admin') abort(403);
@@ -307,11 +300,12 @@ class PedidosController extends Controller
         $pedido->update([
             'estado' => 'listo',
         ]);
+        $this->enviarCorreoEstado($pedido);
 
-        return back()->with('success', 'Pedido marcado como listo para entrega.');
+        return back()->with('success', 'Pedido marcado como listo para recoger.');
     }
 
-    /* ── Helpers ──────────────────────────────────────────────────*/
+    // funciones auxiliares
     private function autorizarPedido(Pedido $pedido): void
     {
         $user = Auth::user();
@@ -323,5 +317,14 @@ class PedidosController extends Controller
         $pedido = $item->pedido;
         $this->autorizarPedido($pedido);
         if ($pedido->estado !== 'borrador') abort(403);  // solo en borrador
+    }
+
+    // envio de correo al cambiar estado (solo para cliente)
+    private function enviarCorreoEstado(Pedido $pedido): void
+    {
+        if ($pedido->user?->email) {
+            Mail::to($pedido->user->email)
+                ->send(new PedidoEstado($pedido));
+        }
     }
 }

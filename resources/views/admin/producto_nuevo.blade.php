@@ -1,13 +1,8 @@
 <x-app-layout :title="__('Nuevo Pastel')">
-    <x-amo-styles />
-
-    {{-- ══════ MAIN ══════ --}}
     <main class="amo-main">
-
-        {{-- Breadcrumb + Title --}}
         <div style="margin-bottom:28px;">
             <nav class="amo-breadcrumb">
-                <a href="{{ route('productos.index') }}">Inventario</a>
+                <a href="{{ route('admin.productos.index') }}">Inventario</a>
                 <span class="material-symbols-outlined" style="font-size:15px;">chevron_right</span>
                 <span class="current">Nuevo Pastel</span>
             </nav>
@@ -19,7 +14,6 @@
             </p>
         </div>
 
-        {{-- Error banner --}}
         @if($errors->any())
             <div class="amo-error-banner">
                 <ul>
@@ -30,13 +24,10 @@
             </div>
         @endif
 
-        {{-- BENTO GRID --}}
-        <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.productos.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;">
-
-                {{-- ── LEFT COLUMN ── --}}
                 <div>
                     {{-- Información General --}}
                     <div class="amo-card">
@@ -172,7 +163,6 @@
                     </div>
                 </div>
 
-                {{-- ── RIGHT COLUMN ── --}}
                 <div style="display:flex;flex-direction:column;gap:20px;">
 
                     {{-- Imagen --}}
@@ -231,7 +221,7 @@
                             <span class="material-symbols-outlined" style="font-size:20px;">save</span>
                             Guardar Pastel
                         </button>
-                        <a href="{{ route('productos.index') }}" class="amo-btn-ghost">
+                        <a href="{{ route('admin.productos.index') }}" class="amo-btn-ghost">
                             Cancelar
                         </a>
                     </div>

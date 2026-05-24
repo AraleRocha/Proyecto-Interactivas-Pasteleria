@@ -1,6 +1,4 @@
 <x-app-layout title="Dashboard Admin">
-    <x-amo-styles />
-
     <style>
         .dash-wrap{max-width:1300px;margin:0 auto;padding:24px;}
         .dash-title{font-family:'Playfair Display',serif;font-size:clamp(30px,4vw,46px);font-weight:700;margin:0;}
