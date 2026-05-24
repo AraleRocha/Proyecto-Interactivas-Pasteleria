@@ -50,6 +50,6 @@ Hola, **{{ $cliente->name }}**
 </x-mail::panel>
 @endif
 
-Gracias,<br>
-{{ config('app.name') }}
+Gracias por confiar en **Amoretti Pastelería**.  
+Esperamos seguir endulzando tus momentos especiales. 💖
 </x-mail::message>

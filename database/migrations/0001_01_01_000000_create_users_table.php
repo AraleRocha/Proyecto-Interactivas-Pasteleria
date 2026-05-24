@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('telefono')->nullable();
-            $table->string('direccion')->nullable();
             $table->string('role')->default('cliente');
             $table->rememberToken();
             $table->softDeletes();

@@ -298,7 +298,7 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
 
         <div class="rg-deco-body">
-            <p class="rg-deco-tag">Bienvenido al obrador</p>
+            <p class="rg-deco-tag">Bienvenido</p>
             <h2 class="rg-deco-headline">Tu primera cuenta,<br>tu primera <em>celebración</em></h2>
             <p class="rg-deco-sub">Accede a un amplio catálogo de pasteles.</p>
         </div>

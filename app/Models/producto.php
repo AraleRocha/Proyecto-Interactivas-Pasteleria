@@ -23,4 +23,18 @@ class producto extends Model
         'disponible',
         'imagen'
     ];
+
+    // Calcular de manera automática la disponibilidad según el stock
+    protected static function booted()
+    {
+        static::saving(function ($producto) {
+
+            if ($producto->stock <= 0) {
+                $producto->disponible = false;
+            } else {
+                $producto->disponible = true;
+            }
+
+        });
+    }
 }

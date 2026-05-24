@@ -214,7 +214,10 @@ class PedidosController extends Controller
         $this->autorizarPedido($pedido);
 
         DB::transaction(function () use ($pedido) {
-            $pedido->update(['estado' => 'cancelado']);
+            $pedido->update([
+                'estado' => 'cancelado',
+                'fecha_entrega' => null,
+            ]);
             $pedido->pago?->delete();
         });
 
@@ -319,12 +322,15 @@ class PedidosController extends Controller
         if ($pedido->estado !== 'borrador') abort(403);  // solo en borrador
     }
 
-    // envio de correo al cambiar estado (solo para cliente)
+    /**
+     * envio de correo al cambiar estado (solo para cliente)
+     * Se envian a cola, para verla es con el comando php artisan queue:work
+     */
     private function enviarCorreoEstado(Pedido $pedido): void
     {
         if ($pedido->user?->email) {
             Mail::to($pedido->user->email)
-                ->send(new PedidoEstado($pedido));
+                ->queue(new PedidoEstado($pedido));
         }
     }
 }

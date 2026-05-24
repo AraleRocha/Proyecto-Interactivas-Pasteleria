@@ -71,7 +71,7 @@
                                         Categoría <span style="color:var(--error);">*</span>
                                     </label>
                                     <select id="categoria" name="categoria" class="amo-select @error('categoria') error @enderror">
-                                        <option value="">Seleccionar</option>
+                                        <option value="">Seleccionar </option>
                                         @foreach(['Boda','Cumpleaños','Bautizo','XV Años','Aniversarios','Baby Showers','Graduaciones'] as $cat)
                                             <option value="{{ $cat }}" {{ old('categoria') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
                                         @endforeach
@@ -91,15 +91,6 @@
                                     <div>
                                         <p style="font-size:13px;font-weight:600;color:var(--on-surface);">Nombre memorable</p>
                                         <p style="font-size:12px;color:var(--on-surface-variant);margin-top:2px;">Un nombre evocador ayuda a que los clientes recuerden y compartan tu creación.</p>
-                                    </div>
-                                </div>
-                                <div class="amo-tip">
-                                    <div class="amo-tip-icon secondary-container">
-                                        <span class="material-symbols-outlined" style="color:var(--secondary);font-size:20px;">description</span>
-                                    </div>
-                                    <div>
-                                        <p style="font-size:13px;font-weight:600;color:var(--on-surface);">Descripción completa</p>
-                                        <p style="font-size:12px;color:var(--on-surface-variant);margin-top:2px;">Incluye la ocasión ideal, ingredientes especiales y personalización disponible.</p>
                                     </div>
                                 </div>
                             </div>

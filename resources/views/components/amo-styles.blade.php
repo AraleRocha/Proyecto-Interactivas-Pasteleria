@@ -80,6 +80,7 @@
 
     .btn-danger{
         width: 100%; border: none; border-radius: 14px; padding: 14px 16px; font-weight: 700; font-size: 14px;
+        background: linear-gradient(135deg, #e14d4d, #b03d3d); color: white;
         cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
         gap: 8px; transition: transform .15s ease, opacity .15s ease, background .15s ease; box-shadow: 0 8px 18px rgba(220, 38, 38, 0.18);
     }
