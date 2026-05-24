@@ -423,7 +423,7 @@
     </div>
 
     {{-- productos --}}
-    <div class="cat-grid" id="product-grid">
+    <div class="cat-grid" id="product-grid" style="margin:0 20px;">
  
         @forelse($productos as $producto)
             @php

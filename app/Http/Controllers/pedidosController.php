@@ -22,8 +22,9 @@ class PedidosController extends Controller
                        ->orderByDesc('fecha_pedido');
 
         if ($user->role !== 'admin') {
-            $query->where('user_id', $user->id)
-                  ->where('estado', '!=', 'borrador');
+            $query->where('user_id', $user->id);
+        } else {
+            $query->whereNotIn('estado', ['borrador', 'pendiente']);
         }
 
         $pedidos = $query->paginate(10);
@@ -174,26 +175,13 @@ class PedidosController extends Controller
                          ->with('success', 'Pedido confirmado. Ya puedes proceder a la compra.');
     }
 
-    // Comprar: pendiente - por_confirmar, se descuenta stock y fija entrega +7 días.
+    // Comprar: pendiente - por_confirmar, fijar entrega +7 días.
     public function comprar(Pedido $pedido)
     {
         $this->autorizarPedido($pedido);
 
         DB::transaction(function () use ($pedido) {
             $pedido->load('productos.producto');
-
-            foreach ($pedido->productos as $item) {
-                $producto = Producto::lockForUpdate()->findOrFail($item->producto_id);
-                if ($producto->stock < $item->cantidad) {
-                    throw ValidationException::withMessages([
-                        'stock' => "Sin stock suficiente para «{$producto->nombre}».",
-                    ]);
-                }
-            }
-
-            foreach ($pedido->productos as $item) {
-                Producto::where('id', $item->producto_id)->decrement('stock', $item->cantidad);
-            }
 
             $pedido->pago?->update(['estado_pago' => 'pagado']);
 
@@ -241,7 +229,7 @@ class PedidosController extends Controller
         return back()->with('success', 'Estado actualizado.');
     }
 
-    //Para Adminm aprobar pedido: por_confirmar → horneando (descuenta stock, marca pago como pagado)
+    //Para Adminm aprobar pedido: por_confirmar: horneando (descuenta stock, marca pago como pagado)
     public function aprobar(Pedido $pedido)
     {
         if (Auth::user()->role !== 'admin') abort(403);

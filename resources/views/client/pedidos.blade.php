@@ -87,6 +87,7 @@ body { background: var(--surface); }
 .est-listo      { background:#d1fae5; color:#065f46; } .est-listo      .estado-dot { background:#10b981; }
 .est-entregado  { background:#dcfce7; color:#166534; } .est-entregado  .estado-dot { background:#22c55e; }
 .est-cancelado  { background:#fee2e2; color:#991b1b; } .est-cancelado  .estado-dot { background:#ef4444; }
+.est-rechazado  { background:#fee2e2; color:#991b1b; } .est-rechazado  .estado-dot { background:#ef4444; }
 
 .ped-card-body { padding: 16px 24px; display: flex; flex-direction: column; gap: 8px; }
 .ped-mini-item {
@@ -200,7 +201,7 @@ body { background: var(--surface); }
                                     </span>
                                     <span>
                                         <span class="material-symbols-outlined">local_shipping</span>
-                                        Entrega: {{ $pedido->fecha_entrega->format('d/m/Y') }}
+                                        Entrega: {{ $pedido->fecha_entrega ? $pedido->fecha_entrega->format('d/m/Y') : 'Sin fecha de entrega' }}
                                     </span>
                                     @if(auth()->user()->role === 'admin')
                                         <span>

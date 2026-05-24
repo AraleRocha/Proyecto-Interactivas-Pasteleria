@@ -10,7 +10,8 @@ class producto extends Model
     use SoftDeletes;
 
     protected $casts = [
-        'imagenes' => 'array'
+        'imagenes' => 'array',
+        'disponible' => 'boolean'
     ];
 
     protected $fillable = [

@@ -39,9 +39,11 @@ body { background: var(--surface); }
 .est-pendiente  { background:#fef3c7; color:#92400e; } .est-pendiente  .estado-dot { background:#f59e0b; }
 .est-confirmado { background:#dbeafe; color:#1e40af; } .est-confirmado .estado-dot { background:#3b82f6; }
 .est-por_confirmar { background:#ede9fe; color:#6d28d9; } .est-por_confirmar .estado-dot { background:#8b5cf6; }
+.est-horneando { background:#ede9fe; color:#6d28d9; } .est-horneando .estado-dot { background:#ede9fe; }
 .est-listo      { background:#d1fae5; color:#065f46; } .est-listo      .estado-dot { background:#10b981; }
 .est-entregado  { background:#dcfce7; color:#166534; } .est-entregado  .estado-dot { background:#22c55e; }
 .est-cancelado  { background:#fee2e2; color:#991b1b; } .est-cancelado  .estado-dot { background:#ef4444; }
+.est-rechazado  { background:#fee2e2; color:#991b1b; } .est-rechazado  .estado-dot { background:#ef4444; }
 
 /* layout */
 .det-grid { display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 24px; align-items: start; }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->dateTime('fecha_pedido');
-            $table->date('fecha_entrega');
+            $table->date('fecha_entrega')->nullable();
             $table->string('estado')->default('pendiente');
             $table->decimal('total', 10, 2);
             $table->softDeletes();
